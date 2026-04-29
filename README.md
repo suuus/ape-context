@@ -160,6 +160,26 @@ The wizard automatically detects already-installed servers and won't duplicate t
 
 The wizard uses `ask_user` with structured form schemas throughout the onboarding flow. When the **experimental forms feature** is enabled in your Copilot client, tool selection questions render as multi-select checkboxes — making it easy to pick multiple tools per category. When forms are off, the same questions fall back to conversational text-based selection. No configuration needed — the skills use the same schema either way.
 
+## Plugins
+
+### Git-Ape — Azure Infrastructure
+
+[**Azure/git-ape**](https://github.com/Azure/git-ape) is a platform engineering plugin that extends this project with Azure infrastructure deployment capabilities. It is a multi-agent system that plans, validates, and deploys Azure resources — with security gates, cost analysis, and CI/CD pipeline integration built in.
+
+After the wizard configures your enterprise context, Git-Ape uses that context to:
+- **Gather** deployment requirements through a guided interview
+- **Generate** ARM templates, architecture diagrams, cost estimates, and security reports
+- **Confirm** with you before anything is created
+- **Deploy** to Azure and run post-deployment validation
+
+Install as a plugin:
+```bash
+# VS Code: search for @agentPlugins → git-ape
+# Copilot CLI:
+copilot plugin marketplace add Azure/git-ape
+copilot plugin install git-ape@git-ape
+```
+
 ## ISEE Framework Alignment
 
 Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
