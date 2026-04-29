@@ -17,6 +17,61 @@ Use the `session_store_sql` tool to query the cloud session store. This contains
 
 Use `scope: "personal"` for individual patterns, `scope: "repository"` for team-wide patterns when the user wants a broader view.
 
+## Consent Gate (MANDATORY — run first)
+
+**Before running any queries or asking about scope**, you MUST ask the user for explicit permission using `ask_user`. Do NOT proceed until the user grants consent.
+
+Present the following information clearly:
+
+**What**: This skill reads your Copilot session history from the last 30 days — session summaries, files you edited, repos you worked in, issues/PRs you referenced, and the messages you sent to Copilot.
+
+**How**: It queries a cloud session store using read-only SQL. Nothing is modified, created, or shared externally. The data stays in this conversation. When using "repository" scope, only aggregate patterns are analysed — individual messages from other contributors are not surfaced.
+
+**Why**: By understanding what you actually work on (not just what's documented), the context wizard can generate more accurate Copilot instructions, detect workflow gaps, and surface patterns you might not notice yourself — like frequently edited files, cross-repo coupling, or missing ticket references.
+
+Use `ask_user` with a boolean consent field. Example:
+
+```
+message: |
+  🔒 **Session history analysis — permission required**
+
+  This skill will **read your Copilot session history** from the last 30 days to discover work patterns and recurring workflows.
+
+  **What is accessed:**
+  • Session summaries and timestamps
+  • Files you edited or created
+  • Repositories you worked in
+  • Issues and PRs referenced in sessions
+  • Messages you sent to Copilot (truncated to 200 chars)
+
+  **How:** Read-only SQL queries against the cloud session store. Nothing is modified or shared.
+
+  **Why:** To generate better Copilot instructions by understanding your actual workflow — not just what's documented.
+
+requestedSchema:
+  properties:
+    consent:
+      type: boolean
+      title: "Allow session history analysis?"
+      description: "Grant permission to read your session history for pattern analysis."
+      default: false
+  required: [consent]
+```
+
+**If the user declines or cancels**, stop immediately. Do not run any queries. Respond politely:
+- "No problem — session history analysis skipped. You can invoke this skill again anytime if you change your mind."
+
+**If the user consents**, proceed to Scope Selection and then the Analysis Steps.
+
+The consent gate runs once per invocation. It is not cached across sessions.
+
+## Scope Selection
+
+When invoked standalone, ask the user:
+- "Should I analyze just your personal history, or the full repository history (all contributors)?"
+- Personal = individual workflow patterns
+- Repository = team-wide patterns and topology
+
 ## Analysis Steps
 
 ### 1. Session themes (last 30 days)
@@ -133,13 +188,6 @@ Use `ask_user` to present findings and confirm:
 - "Based on your session history, here's what I observed about your work patterns. Are these accurate?"
 - Allow the user to correct, add, or dismiss observations
 - Confirmed observations feed into `context-distill` (Phase 8) or directly into `copilot-instructions.md`
-
-## Scope Selection
-
-When invoked standalone, ask the user:
-- "Should I analyze just your personal history, or the full repository history (all contributors)?"
-- Personal = individual workflow patterns
-- Repository = team-wide patterns and topology
 
 ## Important
 
