@@ -142,6 +142,57 @@ The wizard automatically detects already-installed servers and won't duplicate t
 - GitHub Copilot with agent/skill support (VS Code, GitHub.com, or Copilot CLI)
 - No additional dependencies — the agent and skills are pure markdown prompts
 
+## ISEE Framework Alignment
+
+Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
+
+### 🧭 Intent — *What the organisation actually wants*
+
+The wizard captures and codifies organisational intent so that both humans and agents can act on it:
+
+- **Phase 3 (Docs)** locates where intent lives — ADRs, security policies, product docs, engineering guides
+- **Phase 4 (Review)** is the human judgment checkpoint where the user explicitly confirms what gets configured
+- **Phase 6 (Instructions)** translates intent into machine-readable form: cross-tool workflows, "when to use X" guidance, and team conventions written to `copilot-instructions.md`
+
+### 🏗️ Structure — *Guardrails that make speed survivable*
+
+The wizard builds the constraints and codified trade-offs that decisions run inside:
+
+- **Phase 1 (Detect)** reads existing constraints — CI/CD pipelines, cloud platform, existing MCP config
+- **Phase 2 (Discover)** enforces org catalog policies — approved/blocked server lists, trust badges (🐙🏢🔰👥)
+- **Phase 5 (Install)** applies structural invariants (`"type": "local"`, `"tools": ["*"]"`) to every MCP entry
+- **Phase 7 (Configure)** enforces credential governance — secrets never stored directly, `.env` always gitignored, org credential-storage policy respected
+
+Structure lives in `.mcp.json` (what agents *can* access) and `copilot-instructions.md` (how agents *should* behave).
+
+### ⚡ Execution — *Humans and agents shipping together as cells*
+
+The wizard wires up the execution layer and demonstrates the cell model itself:
+
+- **Phase 5 (Install)** connects agents to external systems — Jira, GitHub, M365, Azure
+- **Phase 6 (Instructions)** defines execution paths as cross-tool workflows (bug triage → monitoring → fix → PR → deploy)
+- **Phase 7 (Configure)** makes execution work by testing auth and connections
+- **Individual skills** are independently invocable (`/context-detect`, `/context-discover`, etc.) — cells, not stages
+- **context-wizard** orchestrates the cells, but each carries its own context and can run alone
+
+### 📊 Evidence — *Feedback that changes the next decision*
+
+The wizard creates observable signals that flow back upstream:
+
+- **Phase 7** tests every connection — `✅ Connected` or `❌ Auth failed` as immediate feedback
+- **SQL todo tracking** makes progress visible in real time across VS Code, CLI, and GitHub
+- **Phase 1 → 2 → 3 flow** — each phase's output becomes the next phase's input (detection evidence feeds discovery)
+- **Phase 1 (Detect)** reads existing evidence from git history (commit messages referencing JIRA-123, LINEAR-456) to infer the toolchain
+- **Generated workflows** encode evidence loops into the instructions: "deploy → verify in Azure Monitor → update Jira ticket"
+
+### The two directions of flow
+
+**Downstream (Intent → Execution):** Org policies flow through the org catalog → into `.mcp.json` guardrails → into agent behaviour via instructions.
+
+**Upstream (Evidence → Intent):** Connection tests surface misconfigurations → detection updates the plan → the user confirms revised intent at the Review gate.
+
+Phase 4 (Review) sits at the centre — the point where speed meets human judgment, and where the team owns the choices that matter.
+
 ## License
 
 MIT — see [LICENSE](LICENSE)
