@@ -32,6 +32,11 @@ When an existing server covers a category in read-only mode, ask the user: "work
 - If it exists, prefer org-approved servers and respect the blocked list
 - These get the 🏢 badge
 
+If no org catalog exists, inform the user:
+> "No org-level MCP catalog was found at `{org}/.github/mcp-catalog.json`. An org catalog lets your security team maintain approved/blocked server lists and credential storage policies that apply across all repos. Consider creating one as your MCP adoption grows."
+
+Do not scaffold or create the catalog — just make the recommendation and move on.
+
 ### 3. Vendor Documentation
 - Use `web_search` to find: "{tool name} MCP server official"
 - Use `web_fetch` to read install instructions from vendor docs
@@ -40,6 +45,21 @@ When an existing server covers a category in read-only mode, ask the user: "work
 ### 4. Community
 - Other GitHub results
 - These get the 👥 badge
+
+## Tool Scoping
+
+When presenting each recommended MCP server, ask the user whether they need **read-only** or **read+write** access. This determines the `tools` list in `.mcp.json`:
+
+- **Read+write** (default): `"tools": ["*"]`
+- **Read-only**: scope to get/search/list tools only
+
+Use `ask_user` for each server:
+```
+"Do you need write access to {tool} (create/update/delete), or is read-only enough?"
+→ Choices: ["Read + Write (Recommended)", "Read-only"]
+```
+
+Pass the scoping decision forward to Phase 5 (Install) so it can set the appropriate `tools` list.
 
 ## Categories to cover
 

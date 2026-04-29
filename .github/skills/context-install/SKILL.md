@@ -31,7 +31,13 @@ Install the approved MCP servers by writing their configuration to `.mcp.json` i
 
 ## Critical format requirements
 - Every entry MUST have `"type": "local"` — without it the SDK won't discover the server
-- Every entry MUST have `"tools": ["*"]` — without it no tools are exposed
+- Every entry MUST have a `"tools"` field — without it no tools are exposed
+
+## Tool scoping
+
+Apply the scoping decisions from Phase 2 (Discover):
+- **Read+Write**: `"tools": ["*"]`
+- **Read-only**: scope to specific get/search/list tools for that server, using a concrete allowlist. If the exact read-only tool list isn't known for a server, keep `"tools": ["*"]` and inform the user: "Read-only scoping isn't available for {server} yet — installing with full access. You can restrict the tools list manually later."
 
 ## Important
 - Preserve any existing MCP server entries

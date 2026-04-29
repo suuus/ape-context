@@ -50,7 +50,4 @@ Then mark this phase done:
 UPDATE todos SET status = 'done' WHERE id = 'ctx-configure';
 ```
 
-When all servers are configured, summarize the complete setup and offer:
-1. Commit .mcp.json + copilot-instructions.md to the repo
-2. Export as a team profile (context-profile.json)
-3. Just finish (changes are already saved locally)
+When all servers are configured, summarise the auth setup and move to Phase 7 (Healthcheck) — do NOT offer to commit here. Committing happens in Phase 10 (Feedback).

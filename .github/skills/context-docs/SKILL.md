@@ -4,7 +4,8 @@ description: Identify where team documentation, security policies, and knowledge
 user-invocable: true
 ---
 
-Ask the user where their team's knowledge lives. Use `ask_user` for each category — one at a time.
+Discover where team knowledge, intent, and constraints live. This phase identifies documentation sources and tags them by content type — feeding Phase 8 (Distill) where docs are analyzed to extract actionable intent and guardrails.
+Use `ask_user` for each category — one at a time.
 
 ## Categories
 
@@ -28,10 +29,20 @@ For each, use `ask_user` with multiple choice + an "Other (specify)" freeform fi
 6  **Product documentation**: Where to find Product and business related documentation, for example: PRD, BRD, BDD, Product strategy
    -Options: Sharepoint/Onedrive, Google Docs, Confluence, repo /docs folder, Other
 
+7. **Processes & ceremonies**: Where are team workflows, ceremonies, and operational processes documented? (sprint rituals, deployment processes, incident response flows, code review policies, escalation paths)
+   - Options: Confluence, Notion, GitHub Wiki, repo docs/ folder, SharePoint, Other
+
 For each answer, note:
 - The platform (for MCP server matching)
 - The specific location (space key, repo path, URL pattern)
 - Whether it should be referenced in copilot-instructions.md
+- **Content tag** — classify what kind of content lives there:
+  - `[intent]` — team priorities, values, strategy, what "done well" looks like
+  - `[constraint]` — security policies, compliance rules, approval requirements, deployment rules
+  - `[process]` — ceremonies, workflows, decision flows, escalation paths
+  - `[reference]` — API specs, onboarding guides, how-to docs
+
+These tags feed Phase 8 (Distill), which uses working MCP connections to analyze the docs and extract actionable intent and constraints.
 
 Then mark this phase done:
 ```sql

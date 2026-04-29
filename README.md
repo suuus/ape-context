@@ -34,37 +34,44 @@ git submodule add https://github.com/suuus/ape-context.git .ape-context
 
 ## What It Does
 
-The wizard runs **7 phases** in order, each backed by a dedicated skill:
+The wizard runs **10 phases** in order, each backed by a dedicated skill and mapped to the [ISEE framework](https://agentile.org):
 
-| # | Phase | Skill | What Happens |
-|---|-------|-------|-------------|
-| 1 | **Detect** | `context-detect` | Scans package files, CI/CD, infra, `.mcp.json`, git history |
-| 2 | **Discover** | `context-discover` | Finds MCP servers via GitHub catalog, org catalog, vendor docs |
-| 3 | **Docs** | `context-docs` | Identifies where engineering docs, policies, and runbooks live |
-| 4 | **Review** | `context-review` | Presents the full setup plan for your confirmation |
-| 5 | **Install** | `context-install` | Writes MCP server configs to `.mcp.json` |
-| 6 | **Instructions** | `context-instructions` | Generates `.github/copilot-instructions.md` with enterprise context |
-| 7 | **Configure** | `context-configure` | Guides auth setup, tests connections, offers to commit |
+| # | Phase | Skill | ISEE Layer | What Happens |
+|---|-------|-------|------------|-------------|
+| 1 | **Detect** | `context-detect` | Structure | Scans package files, CI/CD, infra, `.mcp.json`, git history |
+| 2 | **Discover** | `context-discover` | Structure | Finds MCP servers with tool scoping (read vs write) |
+| 3 | **Docs** | `context-docs` | Intent | Discovers where knowledge, intent, and constraints live |
+| 4 | **Review** | `context-review` | — | Presents the full setup plan for your confirmation |
+| 5 | **Install** | `context-install` | Structure | Writes MCP server configs to `.mcp.json` with scoping |
+| 6 | **Configure** | `context-configure` | Execution | Guides auth setup for each MCP server |
+| 7 | **Healthcheck** | `context-healthcheck` | Evidence | Tests all MCP connections before using them |
+| 8 | **Distill** | `context-distill` | Intent | Analyzes docs to extract intent, constraints, autonomy boundaries |
+| 9 | **Instructions** | `context-instructions` | Execution | Generates instructions with enterprise context and distilled intent |
+| 10 | **Feedback** | `context-feedback` | Evidence | Setup report, follow-up scheduling, commit offer |
 
 ## What Gets Created
 
 After a full run:
 
-- **`.mcp.json`** — MCP server configurations (with `"type": "local"` and `"tools": ["*"]`)
-- **`.github/copilot-instructions.md`** — Enterprise context with per-tool instructions, cross-tool workflows, and documentation sources
+- **`.mcp.json`** — MCP server configurations with appropriate tool scoping
+- **`.github/copilot-instructions.md`** — Enterprise context with per-tool instructions, cross-tool workflows, distilled intent and constraints
+- **`.github/context-report.md`** — Setup report with configuration summary and healthcheck results
 
 ## Progress Tracking
 
-The agent uses the **built-in todo mechanism** (SQL `todos` table) for real-time progress tracking. At startup it creates all 7 todos with dependencies:
+The agent uses the **built-in todo mechanism** (SQL `todos` table) for real-time progress tracking. At startup it creates all 10 todos with dependencies:
 
 ```
-☐ Phase 1: Detect project stack
-☐ Phase 2: Discover MCP servers
-☐ Phase 3: Locate team documentation
-☐ Phase 4: Review setup plan
-☐ Phase 5: Install MCP servers
-☐ Phase 6: Generate Copilot instructions
-☐ Phase 7: Configure auth & test
+☐ Phase 1:  Detect project stack
+☐ Phase 2:  Discover MCP servers
+☐ Phase 3:  Discover documentation & intent sources
+☐ Phase 4:  Review setup plan
+☐ Phase 5:  Install MCP servers
+☐ Phase 6:  Configure auth
+☐ Phase 7:  Healthcheck connections
+☐ Phase 8:  Distill intent & constraints
+☐ Phase 9:  Generate Copilot instructions
+☐ Phase 10: Feedback & follow-up
 ```
 
 This works natively in **VS Code**, **GitHub.com**, and **Copilot CLI** — the todo panel shows progress as each phase completes.
@@ -79,6 +86,9 @@ Each skill can be invoked on its own without running the full wizard:
 /context-docs            # Just identify documentation sources
 /context-install         # Just write .mcp.json
 /context-instructions    # Just generate copilot-instructions.md
+/context-healthcheck     # Test all MCP connections
+/context-distill         # Analyze docs for intent & constraints
+/context-drift           # Check for configuration drift
 ```
 
 ## MCP Server Discovery
@@ -110,15 +120,19 @@ The wizard automatically detects already-installed servers and won't duplicate t
 ```
 .github/
 ├── agents/
-│   └── context-wizard.agent.md       # Main orchestrator agent
+│   └── context-wizard.agent.md       # Main orchestrator agent (10 phases)
 └── skills/
     ├── context-detect/SKILL.md        # Phase 1: Scan project stack
-    ├── context-discover/SKILL.md      # Phase 2: Find MCP servers
-    ├── context-docs/SKILL.md          # Phase 3: Locate team docs
+    ├── context-discover/SKILL.md      # Phase 2: Find MCP servers (with tool scoping)
+    ├── context-docs/SKILL.md          # Phase 3: Discover docs & intent sources
     ├── context-review/SKILL.md        # Phase 4: Review plan
-    ├── context-install/SKILL.md       # Phase 5: Write .mcp.json
-    ├── context-instructions/SKILL.md  # Phase 6: Generate instructions
-    └── context-configure/SKILL.md     # Phase 7: Auth & test connections
+    ├── context-install/SKILL.md       # Phase 5: Write .mcp.json (with scoping)
+    ├── context-configure/SKILL.md     # Phase 6: Auth setup
+    ├── context-healthcheck/SKILL.md   # Phase 7: Test connections
+    ├── context-distill/SKILL.md       # Phase 8: Extract intent & constraints
+    ├── context-instructions/SKILL.md  # Phase 9: Generate instructions
+    ├── context-feedback/SKILL.md      # Phase 10: Report & follow-up
+    └── context-drift/SKILL.md         # Standalone: Detect config drift
 ```
 
 ## Customization
@@ -148,20 +162,20 @@ Ape Context implements the [ISEE framework](https://agentile.org) — the struct
 
 ### 🧭 Intent — *What the organisation actually wants*
 
-The wizard captures and codifies organisational intent so that both humans and agents can act on it:
+The wizard discovers and codifies organisational intent so that both humans and agents can act on it:
 
-- **Phase 3 (Docs)** locates where intent lives — ADRs, security policies, product docs, engineering guides
+- **Phase 3 (Docs)** discovers where intent lives — ADRs, security policies, product docs, processes — and tags each source by content type (`[intent]`, `[constraint]`, `[process]`, `[reference]`)
+- **Phase 8 (Distill)** analyzes those sources via working MCP connections to extract intent statements, constraints, autonomy boundaries, and team topology
 - **Phase 4 (Review)** is the human judgment checkpoint where the user explicitly confirms what gets configured
-- **Phase 6 (Instructions)** translates intent into machine-readable form: cross-tool workflows, "when to use X" guidance, and team conventions written to `copilot-instructions.md`
 
 ### 🏗️ Structure — *Guardrails that make speed survivable*
 
 The wizard builds the constraints and codified trade-offs that decisions run inside:
 
 - **Phase 1 (Detect)** reads existing constraints — CI/CD pipelines, cloud platform, existing MCP config
-- **Phase 2 (Discover)** enforces org catalog policies — approved/blocked server lists, trust badges (🐙🏢🔰👥)
-- **Phase 5 (Install)** applies structural invariants (`"type": "local"`, `"tools": ["*"]"`) to every MCP entry
-- **Phase 7 (Configure)** enforces credential governance — secrets never stored directly, `.env` always gitignored, org credential-storage policy respected
+- **Phase 2 (Discover)** enforces org catalog policies — approved/blocked server lists, trust badges (🐙🏢🔰👥) — and asks about tool scoping (read-only vs read+write)
+- **Phase 5 (Install)** applies structural invariants (`"type": "local"`) and tool scoping to every MCP entry
+- **Phase 6 (Configure)** enforces credential governance — secrets never stored directly, `.env` always gitignored, org credential-storage policy respected
 
 Structure lives in `.mcp.json` (what agents *can* access) and `copilot-instructions.md` (how agents *should* behave).
 
@@ -170,20 +184,20 @@ Structure lives in `.mcp.json` (what agents *can* access) and `copilot-instructi
 The wizard wires up the execution layer and demonstrates the cell model itself:
 
 - **Phase 5 (Install)** connects agents to external systems — Jira, GitHub, M365, Azure
-- **Phase 6 (Instructions)** defines execution paths as cross-tool workflows (bug triage → monitoring → fix → PR → deploy)
-- **Phase 7 (Configure)** makes execution work by testing auth and connections
-- **Individual skills** are independently invocable (`/context-detect`, `/context-discover`, etc.) — cells, not stages
+- **Phase 6 (Configure)** makes connections work by setting up auth
+- **Phase 9 (Instructions)** defines execution paths as cross-tool workflows, enriched with distilled intent and constraints
+- **Individual skills** are independently invocable (`/context-detect`, `/context-healthcheck`, `/context-drift`, etc.) — cells, not stages
 - **context-wizard** orchestrates the cells, but each carries its own context and can run alone
 
 ### 📊 Evidence — *Feedback that changes the next decision*
 
 The wizard creates observable signals that flow back upstream:
 
-- **Phase 7** tests every connection — `✅ Connected` or `❌ Auth failed` as immediate feedback
+- **Phase 7 (Healthcheck)** tests every connection — `✅ Connected` or `❌ Auth failed` as immediate feedback, gating Phase 8
+- **Phase 10 (Feedback)** generates a setup report (`.github/context-report.md`) and schedules a follow-up check
+- **`/context-drift`** (standalone) re-scans the project anytime to detect stack changes vs current config
 - **SQL todo tracking** makes progress visible in real time across VS Code, CLI, and GitHub
-- **Phase 1 → 2 → 3 flow** — each phase's output becomes the next phase's input (detection evidence feeds discovery)
 - **Phase 1 (Detect)** reads existing evidence from git history (commit messages referencing JIRA-123, LINEAR-456) to infer the toolchain
-- **Generated workflows** encode evidence loops into the instructions: "deploy → verify in Azure Monitor → update Jira ticket"
 
 ### The two directions of flow
 
