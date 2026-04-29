@@ -156,6 +156,10 @@ The wizard automatically detects already-installed servers and won't duplicate t
 - GitHub Copilot with agent/skill support (VS Code, GitHub.com, or Copilot CLI)
 - No additional dependencies — the agent and skills are pure markdown prompts
 
+### Interactive Forms
+
+The wizard uses `ask_user` with structured form schemas throughout the onboarding flow. When the **experimental forms feature** is enabled in your Copilot client, tool selection questions render as multi-select checkboxes — making it easy to pick multiple tools per category. When forms are off, the same questions fall back to conversational text-based selection. No configuration needed — the skills use the same schema either way.
+
 ## ISEE Framework Alignment
 
 Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
