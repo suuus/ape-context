@@ -2,7 +2,7 @@
 
 > Enterprise context setup wizard for GitHub Copilot
 
-### Ape Context Vanilla experience
+### Ape Context
 
 **Ape Context** is a Copilot agent that onboards your project into the AI-assisted development workflow. It scans your codebase, discovers the right MCP servers for your toolchain, configures them, generates Copilot instructions, and sets up authentication — all through a guided, interactive wizard. You go through the wizard to set enterprise context up for your team once, then distribute it.
 
