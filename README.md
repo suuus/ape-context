@@ -164,15 +164,9 @@ The wizard uses `ask_user` with structured form schemas throughout the onboardin
 
 ### Git-Ape — Azure Infrastructure
 
-[**Azure/git-ape**](https://github.com/Azure/git-ape) is a platform engineering plugin that extends this project with Azure infrastructure deployment capabilities. It is a multi-agent system that plans, validates, and deploys Azure resources — with security gates, cost analysis, and CI/CD pipeline integration built in.
+Ape Context ships as a plugin for [**Azure/git-ape**](https://github.com/Azure/git-ape) — a platform engineering framework built on GitHub Copilot that plans, validates, and deploys Azure infrastructure. Git-Ape uses Ape Context to set up the enterprise context layer (MCP servers, instructions, documentation sources) that its deployment agents rely on.
 
-After the wizard configures your enterprise context, Git-Ape uses that context to:
-- **Gather** deployment requirements through a guided interview
-- **Generate** ARM templates, architecture diagrams, cost estimates, and security reports
-- **Confirm** with you before anything is created
-- **Deploy** to Azure and run post-deployment validation
-
-Install as a plugin:
+Install Ape Context as a Git-Ape plugin:
 ```bash
 # VS Code: search for @agentPlugins → git-ape
 # Copilot CLI:
