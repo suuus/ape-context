@@ -2,9 +2,18 @@
 
 > Enterprise context setup wizard for GitHub Copilot
 
-**Ape Context** is a Copilot agent that onboards your project into the AI-assisted development workflow. It scans your codebase, discovers the right MCP servers for your toolchain, configures them, generates Copilot instructions, and sets up authentication — all through a guided, interactive wizard.
+### Ape Context Vanilla experience
 
-Drop the `.github/` folder into any repo and you're ready to go.
+**Ape Context** is a Copilot agent that onboards your project into the AI-assisted development workflow. It scans your codebase, discovers the right MCP servers for your toolchain, configures them, generates Copilot instructions, and sets up authentication — all through a guided, interactive wizard. You go through the wizard to set enterprise context up for your team once, then distribute it.
+
+### Git-Ape — a framework for Agentic Platform Engineering
+**Ape Context** can be used as a plugin for [**Azure/git-ape**](https://github.com/Azure/git-ape) — a platform engineering framework built on GitHub Copilot that plans, validates, and deploys your infrastructure. Git-Ape uses Ape Context to set up the enterprise context layer (MCP servers, instructions, documentation sources) that its deployment agents rely on.
+
+Ape Context also works standalone — drop the `.github/` folder into any repo and run the wizard without Git-Ape.
+
+## ISEE Framework Alignment
+
+Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
 
 ## Quick Start
 
@@ -166,24 +175,6 @@ The wizard automatically detects already-installed servers and won't duplicate t
 ### Interactive Forms
 
 The wizard uses `ask_user` with structured form schemas throughout the onboarding flow. When the **experimental forms feature** is enabled in your Copilot client, tool selection questions render as multi-select checkboxes — making it easy to pick multiple tools per category. When forms are off, the same questions fall back to conversational text-based selection. No configuration needed — the skills use the same schema either way.
-
-## Plugins
-
-### Git-Ape — Azure Infrastructure
-
-Ape Context ships as a plugin for [**Azure/git-ape**](https://github.com/Azure/git-ape) — a platform engineering framework built on GitHub Copilot that plans, validates, and deploys Azure infrastructure. Git-Ape uses Ape Context to set up the enterprise context layer (MCP servers, instructions, documentation sources) that its deployment agents rely on.
-
-Ape Context also works standalone — drop the `.github/` folder into any repo and run the wizard without Git-Ape.
-
-Install Ape Context as a Git-Ape plugin:
-```bash
-copilot plugin marketplace add suuus/ape-context
-copilot plugin install ape-context@ape-context
-```
-
-## ISEE Framework Alignment
-
-Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
 
 ### 🧭 Intent — *What the organisation actually wants*
 
