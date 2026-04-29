@@ -170,9 +170,7 @@ Ape Context also works standalone — drop the `.github/` folder into any repo a
 
 Install Ape Context as a Git-Ape plugin:
 ```bash
-# VS Code: search for @agentPlugins → git-ape
-# Copilot CLI:
-copilot plugin marketplace add Azure/git-ape
+copilot plugin marketplace add suuus/git-ape
 copilot plugin install git-ape@git-ape
 ```
 
