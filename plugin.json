@@ -1,0 +1,25 @@
+{
+  "name": "ape-context",
+  "description": "Enterprise context setup wizard for GitHub Copilot. Scans your project, discovers MCP servers, configures tools, distills team intent and constraints, and generates Copilot instructions — aligned to the ISEE framework.",
+  "version": "0.0.1",
+  "author": {
+    "name": "Suzanne Daniels",
+    "url": "https://github.com/suuus/ape-context"
+  },
+  "homepage": "https://github.com/suuus/ape-context",
+  "repository": "https://github.com/suuus/ape-context",
+  "license": "MIT",
+  "keywords": [
+    "enterprise",
+    "context",
+    "onboarding",
+    "mcp",
+    "copilot-instructions",
+    "isee-framework",
+    "agentile",
+    "platform-engineering",
+    "wizard"
+  ],
+  "agents": ".github/agents/",
+  "skills": ".github/skills/"
+}

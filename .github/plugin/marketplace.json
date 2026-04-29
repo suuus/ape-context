@@ -1,0 +1,19 @@
+{
+  "name": "ape-context",
+  "owner": {
+    "name": "Suzanne Daniels",
+    "url": "https://github.com/suuus/ape-context"
+  },
+  "metadata": {
+    "description": "Ape Context — Enterprise context setup wizard for GitHub Copilot. Scans your project, discovers MCP servers, configures tools, distills team intent and constraints, and generates Copilot instructions. Works standalone or as a plugin for Git-Ape.",
+    "version": "0.0.1"
+  },
+  "plugins": [
+    {
+      "name": "ape-context",
+      "description": "Enterprise context setup wizard for GitHub Copilot. 10-phase onboarding aligned to the ISEE framework — detect, discover, distill intent, configure, and generate Copilot instructions for your team's toolchain.",
+      "version": "0.0.1",
+      "source": "."
+    }
+  ]
+}
