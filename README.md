@@ -104,7 +104,7 @@ Each skill can be invoked on its own without running the full wizard:
 /context-instructions    # Just generate copilot-instructions.md
 /context-healthcheck     # Test all MCP connections
 /context-distill         # Analyze docs for intent & constraints
-/context-history         # Analyze Copilot session history for patterns
+/context-history         # Analyze Copilot session history for patterns (asks consent first)
 /context-drift           # Check for configuration drift
 ```
 
@@ -168,6 +168,7 @@ The wizard automatically detects already-installed servers and won't duplicate t
 - `.env` files are always added to `.gitignore` before writing
 - The wizard **never pushes to remote** without explicit user permission
 - All tool selections go through user confirmation before installation
+- **Session history analysis requires explicit consent** — `context-history` presents a permission gate explaining what data is accessed, how, and why before running any queries. Declining stops the skill immediately.
 
 ## Requirements
 
@@ -214,6 +215,7 @@ The wizard creates observable signals that flow back upstream:
 - **Phase 7 (Healthcheck)** tests every connection — `✅ Connected` or `❌ Auth failed` as immediate feedback, gating Phase 8
 - **Phase 10 (Feedback)** generates a setup report (`.github/context-report.md`) and schedules a follow-up check
 - **`/context-drift`** (standalone) re-scans the project anytime to detect stack changes vs current config
+- **`/context-history`** (standalone) analyzes Copilot session history to surface what the team *actually does* — complementing docs-based intent with behavioural evidence. Requires explicit user consent before querying.
 - **SQL todo tracking** makes progress visible in real time across VS Code, CLI, and GitHub
 - **Phase 1 (Detect)** reads existing evidence from git history (commit messages referencing JIRA-123, LINEAR-456) to infer the toolchain
 
