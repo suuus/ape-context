@@ -4,11 +4,17 @@ description: Analyze discovered documentation to extract team intent, constraint
 user-invocable: true
 ---
 
-Analyze the documentation sources discovered in Phase 3 (Docs) using the MCP connections verified in Phase 7 (Healthcheck). Extract actionable intent and constraints that flow into Phase 9 (Instructions).
+Analyze the user's Copilot session history and the documentation sources discovered in Phase 3 (Docs) to extract actionable intent and constraints that flow into Phase 9 (Instructions).
 
-This is the **Intent layer** of the ISEE framework — turning implicit organisational knowledge into explicit, machine-readable guardrails.
+This is the **Intent layer** of the ISEE framework — turning implicit organisational knowledge into explicit, machine-readable guardrails. It uses two complementary signals: what the team *documents* (docs) and what the team *actually does* (history).
 
 ## Process
+
+### 0. Analyze session history
+
+**Invoke skill:** `context-history`
+
+Before reading any documentation, analyze the user's Copilot session history. This surfaces behavioural patterns — recurring tasks, file hotspots, cross-repo topology, workflow chains — that reveal implicit intent. History-based observations are presented to the user for confirmation before proceeding.
 
 ### 1. Gather tagged sources from Phase 3
 
@@ -73,14 +79,16 @@ The confirmed intent, constraints, autonomy boundaries, and topology flow direct
 
 - **Read-only**: Only read documents — never modify them
 - **Respect access**: If an MCP server can't access a document, note it and move on
-- **Don't invent**: Only distill what's actually in the docs. If intent isn't documented, flag it: "No explicit deployment policy was found — consider documenting one"
+- **Don't invent**: Only distill what's actually in the docs and history. If intent isn't documented, flag it: "No explicit deployment policy was found — consider documenting one"
 - **Be concise**: Each statement should be one clear sentence that an agent can act on
 - **Ask, don't assume**: When a document is ambiguous, ask the user to clarify rather than interpreting
+- **History complements docs**: When history contradicts documentation, present both signals to the user — the truth is usually in the gap between them
 
 ## Fallback
 
 If no tagged sources are available (Phase 3 was skipped or found nothing):
-- Ask the user directly: "I couldn't find documented intent or constraints. Can you tell me your team's top 3 priorities and any hard rules agents should follow?"
+- Session history from `context-history` may still provide behavioural intent — use it
+- If history is also empty, ask the user directly: "I couldn't find documented intent or session history. Can you tell me your team's top 3 priorities and any hard rules agents should follow?"
 - Use the answers to populate the same structured output
 
 Then mark this phase done:

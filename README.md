@@ -104,6 +104,7 @@ Each skill can be invoked on its own without running the full wizard:
 /context-instructions    # Just generate copilot-instructions.md
 /context-healthcheck     # Test all MCP connections
 /context-distill         # Analyze docs for intent & constraints
+/context-history         # Analyze Copilot session history for patterns
 /context-drift           # Check for configuration drift
 ```
 
@@ -146,6 +147,7 @@ The wizard automatically detects already-installed servers and won't duplicate t
     ├── context-configure/SKILL.md     # Phase 6: Auth setup
     ├── context-healthcheck/SKILL.md   # Phase 7: Test connections
     ├── context-distill/SKILL.md       # Phase 8: Extract intent & constraints
+    ├── context-history/SKILL.md       # Standalone: Analyze session history
     ├── context-instructions/SKILL.md  # Phase 9: Generate instructions
     ├── context-feedback/SKILL.md      # Phase 10: Report & follow-up
     └── context-drift/SKILL.md         # Standalone: Detect config drift
