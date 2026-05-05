@@ -1,0 +1,26 @@
+{
+  "mcpServers": {
+    "atlassian-jira": {
+      "command": "npx",
+      "args": ["-y", "@aashari/mcp-server-atlassian-jira@latest"],
+      "env": {
+        "ATLASSIAN_SITE_NAME": "${ATLASSIAN_SITE_NAME}",
+        "ATLASSIAN_USER_EMAIL": "${ATLASSIAN_USER_EMAIL}",
+        "ATLASSIAN_API_TOKEN": "${ATLASSIAN_API_TOKEN}"
+      },
+      "type": "local",
+      "tools": ["*"]
+    },
+    "microsoft-365": {
+      "command": "node",
+      "args": ["${MCP_MICROSOFT_OFFICE_PATH}/mcp-adapter.cjs"],
+      "env": {
+        "MCP_SERVER_URL": "http://localhost:3000",
+        "MCP_BEARER_TOKEN": "${MCP_BEARER_TOKEN}",
+        "MCP_MODULES": "search,mail,calendar,files,people,contacts,groups,query"
+      },
+      "type": "local",
+      "tools": ["*"]
+    }
+  }
+}

@@ -35,9 +35,29 @@ Install the approved MCP servers by writing their configuration to `.mcp.json` i
 
 ## Tool scoping
 
-Apply the scoping decisions from Phase 2 (Discover):
+Retrieve scoping decisions from the session store:
+
+```sql
+SELECT value FROM session_state WHERE key = 'scoping_decisions';
+```
+
+**Fallback chain** if session state is empty:
+1. Check conversation context for Phase 2 (Discover) output
+2. If neither available, default to `"tools": ["*"]` for all servers and inform the user: "No scoping decisions found from Phase 2 — installing with full access. Run `/context-discover` first to set read-only scoping, or restrict the `tools` list in `.mcp.json` manually."
+
+Apply the retrieved scoping decisions:
 - **Read+Write**: `"tools": ["*"]`
 - **Read-only**: scope to specific get/search/list tools for that server, using a concrete allowlist. If the exact read-only tool list isn't known for a server, keep `"tools": ["*"]` and inform the user: "Read-only scoping isn't available for {server} yet — installing with full access. You can restrict the tools list manually later."
+
+## Retrieve server list
+
+Also retrieve the full server list from the session store if available:
+
+```sql
+SELECT value FROM session_state WHERE key = 'discovered_servers';
+```
+
+Fall back to conversation context if not available.
 
 ## Important
 - Preserve any existing MCP server entries

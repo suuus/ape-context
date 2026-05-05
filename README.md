@@ -15,6 +15,59 @@ Ape Context also works standalone — drop the `.github/` folder into any repo a
 
 Ape Context implements the [ISEE framework](https://agentile.org) — the structural backbone of the Agentile operating model. Each wizard phase maps to one or more ISEE layers, ensuring that AI-assisted development runs inside structure, not around it.
 
+```mermaid
+graph TB
+    subgraph Intent ["🧭 Intent — What the organisation wants"]
+        P3["Phase 3: Docs\n<i>Discover where intent lives</i>"]
+        P8["Phase 8: Distill\n<i>Extract intent, constraints,\nautonomy boundaries</i>"]
+        CL["📋 Intent Changelog\n<i>Audit trail of changes</i>"]
+    end
+
+    subgraph Structure ["🏗️ Structure — Guardrails that make speed survivable"]
+        P1["Phase 1: Detect\n<i>Scan existing constraints</i>"]
+        P2["Phase 2: Discover\n<i>Find MCP servers, set scoping</i>"]
+        P5["Phase 5: Install\n<i>Write .mcp.json with guardrails</i>"]
+    end
+
+    subgraph Execution ["⚡ Execution — Humans and agents shipping together"]
+        P6["Phase 6: Configure\n<i>Set up auth</i>"]
+        P9["Phase 9: Instructions\n<i>Generate copilot-instructions.md</i>"]
+        AT["🔒 Autonomy Table\n<i>PROCEED / ALWAYS ASK / NEVER</i>"]
+    end
+
+    subgraph Evidence ["📊 Evidence — Feedback that changes the next decision"]
+        P7["Phase 7: Healthcheck\n<i>Test all connections</i>"]
+        P10["Phase 10: Feedback\n<i>Report, validate, commit</i>"]
+        DR["🔍 Drift Detection\n<i>Severity: ℹ️ ⚠️ 🔴</i>"]
+    end
+
+    %% Downstream flow
+    P3 --> P8
+    P8 --> P9
+    P8 --> AT
+    P1 --> P2
+    P2 --> P5
+    P5 --> P6
+    P6 --> P7
+
+    %% Review gate
+    P4["Phase 4: Review\n<i>👤 Human judgment gate</i>"]
+    P3 --> P4
+    P4 --> P5
+
+    %% Evidence feedback loops
+    P7 --> P8
+    DR -->|"🔴 intent-affecting\nchanges detected"| P8
+    P8 --> CL
+    P10 -->|"validates artifacts"| P9
+
+    style Intent fill:#e8f4f8,stroke:#2196F3,color:#000
+    style Structure fill:#fff3e0,stroke:#FF9800,color:#000
+    style Execution fill:#e8f5e9,stroke:#4CAF50,color:#000
+    style Evidence fill:#fce4ec,stroke:#E91E63,color:#000
+    style P4 fill:#fff9c4,stroke:#FFC107,color:#000
+```
+
 ## Quick Start
 
 ### Option 1: Install as GitHub Copilot Plugin
@@ -72,6 +125,7 @@ After a full run:
 - **`.mcp.json`** — MCP server configurations with appropriate tool scoping
 - **`.github/copilot-instructions.md`** — Enterprise context with per-tool instructions, cross-tool workflows, distilled intent and constraints
 - **`.github/context-report.md`** — Setup report with configuration summary and healthcheck results
+- **`.github/intent-changelog.md`** — Audit trail of intent statement changes with timestamps and triggers
 
 ## Progress Tracking
 
@@ -94,7 +148,7 @@ This works natively in **VS Code**, **GitHub.com**, and **Copilot CLI** — the 
 
 ## Using Skills Individually
 
-Each skill can be invoked on its own without running the full wizard:
+Each skill can be invoked on its own without running the full wizard. Skills check the session store for prior phase output and fall back gracefully — running lightweight inline detection, asking the user directly, or noting what's missing — so standalone invocations never fail silently.
 
 ```
 /context-detect          # Just scan the project
@@ -195,6 +249,8 @@ The wizard builds the constraints and codified trade-offs that decisions run ins
 - **Phase 2 (Discover)** enforces org catalog policies — approved/blocked server lists, trust badges (🐙🏢🔰👥) — and asks about tool scoping (read-only vs read+write)
 - **Phase 5 (Install)** applies structural invariants (`"type": "local"`) and tool scoping to every MCP entry
 - **Phase 6 (Configure)** enforces credential governance — secrets never stored directly, `.env` always gitignored, org credential-storage policy respected
+- **Phase 8 (Distill)** classifies autonomy boundaries as `PROCEED` / `ALWAYS ASK` / `NEVER` — making agent permissions explicit, not implicit
+- **State persistence** — each wizard phase writes its output to the session store, so downstream phases and standalone skills can retrieve scoping decisions, detected stack, and distilled intent reliably
 
 Structure lives in `.mcp.json` (what agents *can* access) and `copilot-instructions.md` (how agents *should* behave).
 
@@ -205,6 +261,8 @@ The wizard wires up the execution layer and demonstrates the cell model itself:
 - **Phase 5 (Install)** connects agents to external systems — Jira, GitHub, M365, Azure
 - **Phase 6 (Configure)** makes connections work by setting up auth
 - **Phase 9 (Instructions)** defines execution paths as cross-tool workflows, enriched with distilled intent and constraints
+- **Autonomy boundaries** are rendered as a structured table in instructions — agents check their permission level before acting
+- **Error handling** is specified for each skill — timeout enforcement, partial pass semantics, consent denial fallbacks, and merge algorithms are explicit, not left to agent judgment
 - **Individual skills** are independently invocable (`/context-detect`, `/context-healthcheck`, `/context-drift`, etc.) — cells, not stages
 - **context-wizard** orchestrates the cells, but each carries its own context and can run alone
 
@@ -214,7 +272,9 @@ The wizard creates observable signals that flow back upstream:
 
 - **Phase 7 (Healthcheck)** tests every connection — `✅ Connected` or `❌ Auth failed` as immediate feedback, gating Phase 8
 - **Phase 10 (Feedback)** generates a setup report (`.github/context-report.md`) and schedules a follow-up check
-- **`/context-drift`** (standalone) re-scans the project anytime to detect stack changes vs current config
+- **`/context-drift`** (standalone) re-scans the project anytime to detect stack changes vs current config — classifies each finding by severity (`ℹ️ info` / `⚠️ warning` / `🔴 action-required`) and suggests re-distillation when intent-affecting changes are detected
+- **Intent changelog** (`.github/intent-changelog.md`) tracks every change to distilled intent statements, constraints, and autonomy boundaries — with timestamps and triggers (initial setup, manual re-distill, drift-triggered)
+- **Pre-commit validation** checks all generated artifacts against each other — instructions match `.mcp.json`, autonomy table matches distilled boundaries, report counts are accurate — before offering to commit
 - **`/context-history`** (standalone) analyzes Copilot session history to surface what the team *actually does* — complementing docs-based intent with behavioural evidence. Requires explicit user consent before querying.
 - **SQL todo tracking** makes progress visible in real time across VS Code, CLI, and GitHub
 - **Phase 1 (Detect)** reads existing evidence from git history (commit messages referencing JIRA-123, LINEAR-456) to infer the toolchain
@@ -223,9 +283,17 @@ The wizard creates observable signals that flow back upstream:
 
 **Downstream (Intent → Execution):** Org policies flow through the org catalog → into `.mcp.json` guardrails → into agent behaviour via instructions.
 
-**Upstream (Evidence → Intent):** Connection tests surface misconfigurations → detection updates the plan → the user confirms revised intent at the Review gate.
+**Upstream (Evidence → Intent):** Connection tests surface misconfigurations → drift detection classifies severity and flags intent-affecting changes → re-distillation updates constraints → the user confirms revised intent. The intent changelog tracks every change with timestamps and triggers.
 
 Phase 4 (Review) sits at the centre — the point where speed meets human judgment, and where the team owns the choices that matter.
+
+## Contributing
+
+Contributions are welcome! See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+
+This project follows the [Contributor Covenant Code of Conduct](CODE_OF_CONDUCT.md).
+
+For security vulnerabilities, see [SECURITY.md](SECURITY.md).
 
 ## License
 

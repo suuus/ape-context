@@ -32,6 +32,14 @@ Reference any relevant skills or agents:
 
 ### Team Intent & Constraints
 
+Retrieve distilled intent from the session store:
+
+```sql
+SELECT value FROM session_state WHERE key = 'distilled_intent';
+```
+
+Fall back to conversation context if not available. If neither exists, skip this section and note: "No distilled intent available — run `/context-distill` to generate."
+
 Include the distilled output from Phase 8 (Distill). This is the **Intent layer** of ISEE — codified so every agent inherits it.
 
 #### Intent statements
@@ -46,14 +54,39 @@ Hard rules that agents must always respect:
 - "Secrets must be stored in Azure Key Vault, never in environment variables"
 
 #### Autonomy boundaries
-What agents can and cannot do independently:
-- "Agents can create PRs but not merge them"
-- "Agents can query production logs but not modify infrastructure"
+
+Render the classified autonomy boundaries from Phase 8 as a structured table:
+
+> Before performing any action listed below, check its autonomy level. `PROCEED` actions can be taken without confirmation. `ALWAYS ASK` actions require explicit user approval via `ask_user`. `NEVER` actions must not be attempted.
+
+| Action | Level | Notes |
+|--------|-------|-------|
+| Create pull requests | ✅ PROCEED | — |
+| Merge pull requests | 🛑 ALWAYS ASK | Requires team lead approval |
+| Create Jira tickets | ✅ PROCEED | Must reference PR |
+| Close Jira tickets | 🛑 ALWAYS ASK | — |
+| Query production logs | ✅ PROCEED | Read-only |
+| Modify infrastructure | ⛔ NEVER | Platform team only |
+| Deploy to production | 🛑 ALWAYS ASK | Requires manual approval |
+
+The table above is an example — populate it with the actual classifications confirmed by the user in Phase 8 (Distill). Use the icons consistently:
+- ✅ for `PROCEED`
+- 🛑 for `ALWAYS ASK`
+- ⛔ for `NEVER`
 
 #### Team topology (if available)
 Ownership and routing:
 - "Team Alpha owns the payments service"
 - "Security team must approve changes to auth modules"
+
+#### Intent changelog reference
+After writing the intent and constraints sections, add a footer linking to the changelog:
+
+```markdown
+> Intent changelog: [.github/intent-changelog.md](intent-changelog.md) | Last updated: {date}
+```
+
+This makes the changelog discoverable from the instructions file and provides an audit trail for when and why guardrails changed.
 
 ### Cross-tool workflows
 Based on the tools configured AND the processes discovered in Phase 3/8, describe common workflows:
@@ -77,6 +110,16 @@ Reference the locations identified in Phase 3, using the content tags:
 - Keep instructions actionable — tell Copilot WHEN to use each tool
 - Reference actual tool names that Copilot can invoke
 - Intent statements and constraints should be written as directives, not descriptions — they tell agents what to do, not what the team thinks about
+
+### Merge algorithm for existing files
+
+When updating `copilot-instructions.md`:
+
+1. **File doesn't exist** → create it with the full `## Enterprise Context` section
+2. **File exists, no `## Enterprise Context` heading** → append the new section at the end of the file
+3. **File exists with `## Enterprise Context`** → replace everything from `## Enterprise Context` up to (but not including) the next `## ` heading at the same level, or end of file if no next heading
+4. **Preserve user content** — all sections outside `## Enterprise Context` are never modified. Custom instructions, notes, and other headings remain untouched
+5. **Manual edit detection** — if the existing Enterprise Context section contains content that doesn't match wizard-generated patterns (e.g., hand-written tool descriptions, custom workflows), warn the user via `ask_user`: "The Enterprise Context section appears to have manual edits. Regenerating will replace them. Proceed?"
 
 Then mark this phase done:
 ```sql

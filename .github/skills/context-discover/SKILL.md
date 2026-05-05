@@ -61,6 +61,15 @@ Use `ask_user` for each server:
 
 Pass the scoping decision forward to Phase 5 (Install) so it can set the appropriate `tools` list.
 
+## Standalone invocation
+
+When invoked outside the wizard flow (no Phase 1 output available):
+
+1. Check the session store: `SELECT value FROM session_state WHERE key = 'detected_stack';`
+2. If state exists, use it as the basis for discovery
+3. If no state exists, run a lightweight detection inline: scan `package.json`, CI/CD workflow files, `.mcp.json`, and cloud indicators — enough to determine which categories are relevant
+4. Inform the user: "Running quick stack detection since Phase 1 hasn't been run. For a thorough scan, run `/context-detect` first."
+
 ## Categories to cover
 
 For each category, use `ask_user` with **multi-select** (checkboxes, not radio buttons) so users can pick multiple tools. Always include an "Other (specify)" freeform option.
@@ -96,6 +105,20 @@ Categories:
 **Important**: When the user selects a service like SharePoint, Teams, Outlook, OneDrive — check if `workiq` is already installed. If so, it already covers that service. Same logic for all multi-service MCP servers.
 
 For each confirmed tool, present the best match with its trust badge and whether it's already installed.
+
+## Persist decisions
+
+After all categories are confirmed, write the decisions to the session store so Phase 5 (Install) can retrieve them:
+
+```sql
+INSERT OR REPLACE INTO session_state (key, value) 
+VALUES ('scoping_decisions', '{json map of server_name → "read-only" or "read-write"}');
+
+INSERT OR REPLACE INTO session_state (key, value) 
+VALUES ('discovered_servers', '{json array of {name, badge, scope, category, install_cmd}}');
+```
+
+This ensures Install can retrieve scoping decisions even if conversation context is lost.
 
 Then mark this phase done:
 ```sql

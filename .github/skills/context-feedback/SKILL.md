@@ -12,6 +12,15 @@ This is the **Evidence layer** of the ISEE framework — creating observable sig
 
 ### 1. Generate setup report
 
+Retrieve data from the session store to populate the report:
+
+```sql
+SELECT value FROM session_state WHERE key = 'healthcheck_results';
+SELECT value FROM session_state WHERE key = 'distilled_intent';
+```
+
+Fall back to conversation context if not available.
+
 Create `.github/context-report.md` with a summary of everything configured:
 
 ```markdown
@@ -46,6 +55,14 @@ Create `.github/context-report.md` with a summary of everything configured:
 ### Autonomy Boundaries
 - {statements from Phase 8}
 
+## Intent Changes
+
+| Date | Trigger | Added | Modified | Removed |
+|------|---------|-------|----------|---------|
+| {date} | {trigger} | {n} | {n} | {n} |
+
+Details: [.github/intent-changelog.md](intent-changelog.md)
+
 ## Healthcheck Results
 - {results from Phase 7}
 
@@ -53,7 +70,40 @@ Create `.github/context-report.md` with a summary of everything configured:
 - `.mcp.json` — MCP server configurations
 - `.github/copilot-instructions.md` — enterprise context and instructions
 - `.github/context-report.md` — this report
+- `.github/intent-changelog.md` — intent change audit trail
 ```
+
+### 1.5. Validate generated artifacts
+
+Before offering to commit, cross-check all generated artifacts for consistency:
+
+**Check 1: Instructions ↔ MCP servers**
+- Every server in `.mcp.json` should be documented in `copilot-instructions.md`
+- Every server referenced in instructions should exist in `.mcp.json`
+- Flag: "⚠️ `{server}` is configured in .mcp.json but not documented in instructions" or vice versa
+
+**Check 2: Autonomy table ↔ distilled boundaries**
+- If Phase 8 produced autonomy boundaries, verify the instructions file contains an autonomy table
+- Flag: "⚠️ {N} autonomy boundaries were distilled but instructions has no autonomy table"
+
+**Check 3: Intent changelog ↔ instructions footer**
+- If `.github/intent-changelog.md` exists, verify `copilot-instructions.md` contains the changelog reference footer
+- Flag: "⚠️ Intent changelog exists but instructions don't link to it"
+
+**Check 4: Report accuracy**
+- Verify the counts in the report match actual content (number of servers in `.mcp.json`, number of doc sources, number of intent statements in instructions)
+- Flag: "⚠️ Report says {N} MCP servers but .mcp.json has {M}"
+
+**Check 5: File existence**
+- Every file listed in the report's "Files Modified" section should exist on disk
+- Flag: "⚠️ Report references `{file}` but it doesn't exist"
+
+**If any checks fail:**
+- Present issues to the user: "Found {N} consistency issues before commit:"
+- List each issue
+- Ask via `ask_user`: "Want me to fix these before committing?"
+- If yes, regenerate the affected sections
+- If no, proceed to commit and note the issues in the report
 
 ### 2. Schedule follow-up
 
@@ -77,7 +127,7 @@ Options:
 - "Don't commit yet" — leave changes as local modifications
 
 If committing:
-- Stage only the wizard-generated files (`.mcp.json`, `.github/copilot-instructions.md`, `.github/context-report.md`)
+- Stage only the wizard-generated files (`.mcp.json`, `.github/copilot-instructions.md`, `.github/context-report.md`, `.github/intent-changelog.md`)
 - Commit message: "chore: configure enterprise context layer via context-wizard"
 - Ask before pushing: "Push to remote?"
 

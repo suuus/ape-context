@@ -26,8 +26,8 @@ For each, use `ask_user` with multiple choice + an "Other (specify)" freeform fi
 5. **Architecture decisions**: Where are ADRs and design documents?
    - Options: docs/adr/ in repo, Confluence, GitHub Discussions, Other
 
-6  **Product documentation**: Where to find Product and business related documentation, for example: PRD, BRD, BDD, Product strategy
-   -Options: Sharepoint/Onedrive, Google Docs, Confluence, repo /docs folder, Other
+6. **Product documentation**: Where to find Product and business related documentation, for example: PRD, BRD, BDD, Product strategy
+   - Options: Sharepoint/Onedrive, Google Docs, Confluence, repo /docs folder, Other
 
 7. **Processes & ceremonies**: Where are team workflows, ceremonies, and operational processes documented? (sprint rituals, deployment processes, incident response flows, code review policies, escalation paths)
    - Options: Confluence, Notion, GitHub Wiki, repo docs/ folder, SharePoint, Other
@@ -43,6 +43,17 @@ For each answer, note:
   - `[reference]` — API specs, onboarding guides, how-to docs
 
 These tags feed Phase 8 (Distill), which uses working MCP connections to analyze the docs and extract actionable intent and constraints.
+
+## Persist results
+
+Write the tagged documentation sources to the session store for Phase 8 (Distill):
+
+```sql
+INSERT OR REPLACE INTO session_state (key, value) 
+VALUES ('tagged_doc_sources', '{json array}');
+```
+
+The JSON should include each source with: category, platform, location, content tag ([intent]/[constraint]/[process]/[reference]), and URL or path where applicable.
 
 Then mark this phase done:
 ```sql

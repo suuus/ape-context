@@ -29,35 +29,74 @@ For each server in `.mcp.json`:
 - Check if any configured MCP server packages have newer versions available
 - Report: "atlassian-mcp-server: using @latest (current), github-mcp-server: using @latest (current)"
 
+### 5. Intent impact
+Assess whether detected changes affect the team's distilled intent, constraints, or autonomy boundaries:
+- **Security tools** added or removed (e.g., new scanning tool, removed WAF)
+- **Deployment pipeline** changed (e.g., new CI/CD system, changed deploy targets)
+- **Cloud platform** changed (e.g., new provider, new services adopted)
+- **Monitoring/observability** changed (e.g., switched from Datadog to App Insights)
+- **Access control** changed (e.g., new auth provider, changed RBAC model)
+
+If any intent-relevant changes are detected, classify them as `🔴 action-required`.
+
+## Severity classification
+
+Classify each drift item by severity:
+
+| Level | Icon | Meaning | Examples |
+|-------|------|---------|----------|
+| Info | `ℹ️` | Minor, no action needed | Package version update available |
+| Warning | `⚠️` | Should be addressed soon | New tool detected, auth expiring, stale instruction reference |
+| Action required | `🔴` | Needs immediate attention | Auth failed, tool removed but still configured, intent-affecting stack changes |
+
+Intent-affecting changes (security tools, deployment pipeline, cloud platform, monitoring, access control) are always `🔴 action-required`.
+
 ## Report format
 
 ```
 🔍 Drift Report
 ═══════════════
 
-Stack changes detected:
-  ➕ Terraform files found — no MCP server configured
-  ➕ Redis references found — no MCP server configured
-  ➖ Datadog configured but no references in project
+Severity: {N} action-required | {N} warnings | {N} info
 
-Server health:
-  ✅ github-mcp-server — connected
-  ✅ atlassian-jira — connected
-  ⚠️ workiq — auth token expired
+🔴 Action required:
+  1. Terraform added — no MCP server configured (may affect deployment constraints)
+  2. workiq auth expired — M365 doc sources unreachable
 
-Instruction drift:
-  ⚠️ copilot-instructions.md references "datadog-mcp-server" — not in .mcp.json
+⚠️ Warnings:
+  3. Redis references found — no MCP server configured
+  4. copilot-instructions.md references "datadog-mcp-server" — not in .mcp.json
 
-No action needed: 2 servers | Action recommended: 3 items
+ℹ️ Info:
+  5. atlassian-mcp-server: newer version available
+
+No action needed: 2 servers | Action recommended: 4 items
 ```
 
 ## Actions
 
-After presenting the report, offer to fix each issue:
+After presenting the report, offer to fix each issue in severity order (action-required first):
 - For new tools: run the relevant wizard phases (Discover → Install → Configure)
 - For removed tools: remove the entry from `.mcp.json` and update instructions
 - For auth issues: re-run Configure for that server
 - For instruction drift: re-run the Instructions phase
 
 Use `ask_user` for each recommended action — never auto-fix without confirmation.
+
+### Intent re-distillation
+
+When any `🔴 action-required` item is flagged as intent-affecting, after addressing the immediate fixes, ask:
+
 ```
+ask_user:
+  message: "Some changes may affect your team's distilled intent and constraints. Want to review and update them?"
+  requestedSchema:
+    properties:
+      re_distill:
+        type: boolean
+        title: "Run /context-distill to review intent"
+        description: "Re-analyzes your documentation and session history to update intent statements, constraints, and autonomy boundaries. Changes will be logged in .github/intent-changelog.md."
+        default: true
+```
+
+If accepted, invoke the `context-distill` skill. The trigger will be recorded as "drift-triggered" in the intent changelog.

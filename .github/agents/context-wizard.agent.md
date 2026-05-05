@@ -26,7 +26,7 @@ INSERT INTO todos (id, title, description, status) VALUES
   ('ctx-install',      'Phase 5: Install MCP servers',               'Write approved MCP server configs to .mcp.json with appropriate tool scoping',                        'pending'),
   ('ctx-configure',    'Phase 6: Configure auth',                    'Guide credential setup for each MCP server that needs authentication',                                'pending'),
   ('ctx-healthcheck',  'Phase 7: Healthcheck',                       'Test all MCP server connections — verify they work before using them to analyze docs',                 'pending'),
-  ('ctx-distill',      'Phase 8: Distill intent & constraints',      'Analyze discovered docs via working MCP connections to extract intent, constraints, autonomy boundaries', 'pending'),
+  ('ctx-distill',      'Phase 8: Distill intent & constraints',      'Analyze discovered docs via working MCP connections to extract intent, constraints, autonomy boundaries. Log changes to .github/intent-changelog.md', 'pending'),
   ('ctx-instructions', 'Phase 9: Generate Copilot instructions',     'Create/update copilot-instructions.md with enterprise context, distilled intent, and guardrails',      'pending'),
   ('ctx-feedback',     'Phase 10: Feedback & follow-up',             'Generate setup report, schedule follow-up check, offer to commit all changes',                         'pending');
 
@@ -41,6 +41,39 @@ INSERT INTO todo_deps (todo_id, depends_on) VALUES
   ('ctx-instructions', 'ctx-distill'),
   ('ctx-feedback',     'ctx-instructions');
 ```
+
+## State Persistence
+
+Phases communicate through the SQL session store. Each phase writes its key outputs so downstream phases (and standalone skill invocations) can retrieve them.
+
+**At startup**, create the state table if needed:
+
+```sql
+CREATE TABLE IF NOT EXISTS session_state (key TEXT PRIMARY KEY, value TEXT);
+```
+
+**State keys written by each phase:**
+
+| Key | Written by | Read by | Content |
+|-----|-----------|---------|---------|
+| `detected_stack` | Phase 1 (Detect) | Phase 2 (Discover), Drift | JSON: languages, frameworks, CI/CD, cloud, existing MCP servers |
+| `discovered_servers` | Phase 2 (Discover) | Phase 4 (Review), Phase 5 (Install) | JSON: array of {name, badge, scope, category, install_cmd} |
+| `scoping_decisions` | Phase 2 (Discover) | Phase 5 (Install) | JSON: map of server_name → "read-only" or "read-write" |
+| `tagged_doc_sources` | Phase 3 (Docs) | Phase 8 (Distill) | JSON: array of {category, platform, location, tag, url} |
+| `healthcheck_results` | Phase 7 (Healthcheck) | Phase 8 (Distill), Phase 10 (Feedback) | JSON: map of server_name → {status, detail} |
+| `distilled_intent` | Phase 8 (Distill) | Phase 9 (Instructions), Phase 10 (Feedback) | JSON: {intent[], constraints[], autonomy[], topology[]} |
+
+**Write pattern:**
+```sql
+INSERT OR REPLACE INTO session_state (key, value) VALUES ('scoping_decisions', '{...json...}');
+```
+
+**Read pattern:**
+```sql
+SELECT value FROM session_state WHERE key = 'scoping_decisions';
+```
+
+**Standalone fallback:** If a standalone skill needs state from a prior phase that isn't available, inform the user: "This skill needs output from Phase {N} ({name}). Run `/context-{skill}` first, or run the full wizard with `@context-wizard`."
 
 **Before starting each phase:**
 ```sql
@@ -103,7 +136,7 @@ Test all configured MCP server connections. Every server must respond before pro
 ### Phase 8: DISTILL INTENT & CONSTRAINTS → `ctx-distill`
 **Invoke skill:** `context-distill`
 
-Use working MCP connections to analyze the documentation sources discovered in Phase 3. Extract intent statements, constraints, autonomy boundaries, and team topology. Present findings to the user for confirmation. This is the **Intent layer** of ISEE — turning implicit knowledge into explicit, actionable guardrails.
+Use working MCP connections to analyze the documentation sources discovered in Phase 3. Extract intent statements, constraints, autonomy boundaries, and team topology. Present findings to the user for confirmation. Changes are diffed against previous intent and logged to `.github/intent-changelog.md`. This is the **Intent layer** of ISEE — turning implicit knowledge into explicit, actionable guardrails.
 
 ### Phase 9: INSTRUCTIONS → `ctx-instructions`
 **Invoke skill:** `context-instructions`

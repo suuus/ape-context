@@ -36,6 +36,17 @@ Summarize your findings in a clear list:
 - Existing Copilot configuration
 - cli tools & scripts that are relevant in this context
 
+## Persist results
+
+Write the detected stack to the session store so downstream phases can retrieve it:
+
+```sql
+INSERT OR REPLACE INTO session_state (key, value) 
+VALUES ('detected_stack', '{json summary}');
+```
+
+The JSON should include: languages detected, frameworks, CI/CD system, cloud platform, existing MCP servers from `.mcp.json`, and any tool references found in git history.
+
 Then mark this phase done:
 ```sql
 UPDATE todos SET status = 'done' WHERE id = 'ctx-detect';
