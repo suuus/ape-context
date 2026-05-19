@@ -1,0 +1,32 @@
+name: context-healthcheck-eval
+description: Tests MCP health classification, missing config handling, healthcheck_results persistence, and wizard blocking semantics.
+skill: context-healthcheck
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-healthcheck
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: read_only_no_retry
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|we)\\s+(created|modified|deleted|retried|installed|authenticated|logged in)\\b"
+        - "(?i)\\b(I|we)\\s+(wrote|updated)\\s+external"
+tasks:
+  - "tasks/*.yaml"

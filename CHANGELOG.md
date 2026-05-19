@@ -8,6 +8,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/), and this
 
 ### Added
 - **Intent changelog** (`.github/intent-changelog.md`) — audit trail tracking every change to distilled intent statements, constraints, and autonomy boundaries with timestamps and triggers
+- **Compliance and regulatory discovery** — Phase 3 now treats security, compliance, regulatory, and audit sources as first-class constraint sources; Phase 8 distills sourced obligations, evidence needs, autonomy limits, and gaps
 - **Autonomy classifications** — Phase 8 (Distill) classifies agent actions as `PROCEED` / `ALWAYS ASK` / `NEVER`; Phase 9 (Instructions) renders them as a structured table
 - **Drift severity classification** — `/context-drift` classifies findings as `ℹ️ info` / `⚠️ warning` / `🔴 action-required` with intent-impact detection
 - **Drift → re-distillation loop** — when drift detects intent-affecting changes, suggests re-running Phase 8

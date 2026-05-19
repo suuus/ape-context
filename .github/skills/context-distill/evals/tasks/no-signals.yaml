@@ -1,0 +1,17 @@
+id: no-signals
+name: No docs or history
+description: Ensures the skill asks for direct input rather than fabricating intent.
+tags:
+  - no-fabrication
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation: tagged_doc_sources is empty and history_observations is empty/skipped. Do not query live tools and do not edit files.
+    Use context-distill and explain the next response.
+expected:
+  output_contains:
+    - "ask"
+    - "priorities"
+    - "rules"
+  outcomes:
+    - type: task_completed

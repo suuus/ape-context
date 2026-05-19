@@ -1,0 +1,23 @@
+id: org-catalog-policy
+name: Org catalog policy
+description: Ensures approved catalog entries are preferred and blocked entries are not recommended.
+tags:
+  - org-catalog
+  - policy
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only provided fixtures, do not search live catalogs, and do not edit files.
+    Use context-discover. detected_stack includes Jira. The org catalog fixture approves atlassian-jira and blocks random-jira-mcp.
+    Explain which server should be recommended and how blocked entries are handled.
+  files:
+    - path: org-mcp-catalog.json
+      content: |
+        {"approved":[{"name":"atlassian-jira","install_cmd":"npx -y @aashari/mcp-server-atlassian-jira@latest"}],"blocked":["random-jira-mcp"]}
+expected:
+  output_contains:
+    - "atlassian-jira"
+    - "approved"
+    - "blocked"
+    - "random-jira-mcp"
+  outcomes:
+    - type: task_completed

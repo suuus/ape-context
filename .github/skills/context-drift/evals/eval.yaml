@@ -1,0 +1,31 @@
+name: context-drift-eval
+description: Tests dry-run drift detection for stack/config/instructions/health changes and clean reports.
+skill: context-drift
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-drift
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: dry_run_safe
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|I've|we|we've)\\s+(created|modified|deleted|installed|configured|removed)\\b"
+tasks:
+  - "tasks/*.yaml"

@@ -1,0 +1,17 @@
+id: missing-state
+name: Missing approved server state
+description: Ensures the skill stops when discovery/review state is missing.
+tags:
+  - install
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files.
+    Use context-install with no discovered_servers and no scoping_decisions available. Explain the required prerequisite phases.
+expected:
+  output_contains:
+    - "discovered_servers"
+    - "context-discover"
+    - "context-review"
+  outcomes:
+    - type: task_completed

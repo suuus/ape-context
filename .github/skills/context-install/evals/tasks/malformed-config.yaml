@@ -1,0 +1,23 @@
+id: malformed-config
+name: Malformed .mcp.json
+description: Ensures malformed config is reported rather than overwritten.
+tags:
+  - install
+  - error
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files.
+    Use context-install with an approved github-mcp-server, but the existing .mcp.json fixture is malformed. Explain the error path.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers": {
+expected:
+  output_contains:
+    - "parse"
+    - "malformed"
+    - "ask"
+    - "before overwriting"
+    - "github-mcp-server"
+  outcomes:
+    - type: task_completed

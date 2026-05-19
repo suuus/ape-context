@@ -1,0 +1,18 @@
+id: missing-config
+name: Missing MCP config
+description: Ensures standalone invocation stops clearly when no MCP config exists.
+tags:
+  - standalone
+  - error-handling
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not search outside the eval workspace and do not create files.
+    Use the context-configure skill in a workspace where `.mcp.json` is missing.
+    Explain the correct behavior.
+expected:
+  output_contains:
+    - ".mcp.json"
+    - "no installed MCP servers"
+    - "stop"
+  outcomes:
+    - type: task_completed

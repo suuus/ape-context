@@ -1,0 +1,20 @@
+id: revise-plan
+name: Routes revision back to correct phase
+description: Ensures Revise identifies a phase to revisit.
+tags:
+  - review
+  - revise
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not make changes.
+    Use context-review for a plan where the user says: "Revise: remove the Jira MCP server and re-check documentation sources."
+    Return the decision object and identify the phase or phases to revisit.
+expected:
+  output_contains:
+    - "decision"
+    - "revise"
+    - "context-discover"
+    - "context-docs"
+    - "Jira"
+  outcomes:
+    - type: task_completed

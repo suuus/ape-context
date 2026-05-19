@@ -109,12 +109,12 @@ The wizard runs **10 phases** in order, each backed by a dedicated skill and map
 |---|-------|-------|------------|-------------|
 | 1 | **Detect** | `context-detect` | Structure | Scans package files, CI/CD, infra, `.mcp.json`, git history |
 | 2 | **Discover** | `context-discover` | Structure | Finds MCP servers with tool scoping (read vs write) |
-| 3 | **Docs** | `context-docs` | Intent | Discovers where knowledge, intent, and constraints live |
+| 3 | **Docs** | `context-docs` | Intent | Discovers where knowledge, intent, compliance/regulatory/audit policy, and constraints live |
 | 4 | **Review** | `context-review` | — | Presents the full setup plan for your confirmation |
 | 5 | **Install** | `context-install` | Structure | Writes MCP server configs to `.mcp.json` with scoping |
 | 6 | **Configure** | `context-configure` | Execution | Guides auth setup for each MCP server |
 | 7 | **Healthcheck** | `context-healthcheck` | Evidence | Tests all MCP connections before using them |
-| 8 | **Distill** | `context-distill` | Intent | Analyzes docs to extract intent, constraints, autonomy boundaries |
+| 8 | **Distill** | `context-distill` | Intent | Analyzes docs to extract intent, regulatory obligations, constraints, autonomy boundaries |
 | 9 | **Instructions** | `context-instructions` | Execution | Generates instructions with enterprise context and distilled intent |
 | 10 | **Feedback** | `context-feedback` | Evidence | Setup report, follow-up scheduling, commit offer |
 
@@ -229,6 +229,24 @@ The wizard automatically detects already-installed servers and won't duplicate t
 - GitHub Copilot with agent/skill support (VS Code, GitHub.com, or Copilot CLI)
 - No additional dependencies — the agent and skills are pure markdown prompts
 
+## Waza Evaluation
+
+Skill-level Waza suites live next to each skill under `.github/skills/<skill>/evals/` and validate readiness, coverage, and dry-run behavior:
+
+```bash
+waza --no-update-check check --format json
+waza --no-update-check coverage --format json
+waza --no-update-check run --discover --strict --no-summary
+```
+
+The `context-wizard` agent has a separate orchestration-level suite because Waza discovery targets skills, not `.agent.md` files. Run it explicitly:
+
+```bash
+waza --no-update-check run evals/context-wizard-agent/eval.yaml --no-summary
+```
+
+That suite checks phase ordering, review gating, cross-skill state handoff, healthcheck gating, and final feedback safety boundaries.
+
 ### Interactive Forms
 
 The wizard uses `ask_user` with structured form schemas throughout the onboarding flow. When the **experimental forms feature** is enabled in your Copilot client, tool selection questions render as multi-select checkboxes — making it easy to pick multiple tools per category. When forms are off, the same questions fall back to conversational text-based selection. No configuration needed — the skills use the same schema either way.
@@ -237,8 +255,8 @@ The wizard uses `ask_user` with structured form schemas throughout the onboardin
 
 The wizard discovers and codifies organisational intent so that both humans and agents can act on it:
 
-- **Phase 3 (Docs)** discovers where intent lives — ADRs, security policies, product docs, processes — and tags each source by content type (`[intent]`, `[constraint]`, `[process]`, `[reference]`)
-- **Phase 8 (Distill)** analyzes those sources via working MCP connections to extract intent statements, constraints, autonomy boundaries, and team topology
+- **Phase 3 (Docs)** discovers where intent lives — ADRs, security/compliance/regulatory/audit policies, product docs, processes — and tags each source by content type (`[intent]`, `[constraint]`, `[process]`, `[reference]`)
+- **Phase 8 (Distill)** analyzes those sources via working MCP connections to extract intent statements, regulatory obligations, constraints, autonomy boundaries, and team topology
 - **Phase 4 (Review)** is the human judgment checkpoint where the user explicitly confirms what gets configured
 
 ### 🏗️ Structure — *Guardrails that make speed survivable*

@@ -1,0 +1,18 @@
+id: persistence-contract
+name: Persistence contract
+description: Ensures downstream install inputs are clearly described.
+tags:
+  - persistence
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not search outside the eval workspace and do not edit files.
+    Use context-discover and describe the exact persisted outputs needed by context-install after discovery.
+expected:
+  output_contains:
+    - "discovered_servers"
+    - "scoping_decisions"
+    - "unresolved_tools"
+    - "read-only"
+    - "read-write"
+  outcomes:
+    - type: task_completed

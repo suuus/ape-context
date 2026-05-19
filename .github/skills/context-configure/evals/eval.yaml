@@ -1,0 +1,31 @@
+name: context-configure-eval
+description: Tests context-configure routing, secret-safe credential setup guidance, and auth failure recovery.
+skill: context-configure
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-configure
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 80"
+  - type: text
+    name: no_secret_leak
+    config:
+      regex_not_match:
+        - "(?i)(token|secret|password)\\s*[:=]\\s*['\"]?[A-Za-z0-9_\\-]{24,}"
+tasks:
+  - "tasks/*.yaml"

@@ -1,0 +1,21 @@
+id: sql-guidance
+name: SQL guidance
+description: Ensures examples use session_store_sql DuckDB syntax with safe filters and null guards.
+tags:
+  - sql
+  - safety
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not call session_store_sql or any live history tool.
+    Use context-history and explain the SQL requirements, including one safe example for recent summaries.
+    Include these exact terms in the answer: DuckDB, LIMIT, COALESCE, IS NOT NULL.
+expected:
+  output_contains:
+    - "session_store_sql"
+    - "DuckDB"
+    - "now() - INTERVAL '30 days'"
+    - "LIMIT"
+    - "COALESCE"
+    - "IS NOT NULL"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,20 @@
+id: stop-empty
+name: Stop and empty states
+description: Ensures no-server/no-catalog plans are handled explicitly and stop prevents progress.
+tags:
+  - review
+  - stop
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files.
+    Use context-review for a plan with no recommended MCP servers, no org catalog, and no file changes. Simulate that the user chooses Stop.
+    Return the decision object and explain what will not happen.
+expected:
+  output_contains:
+    - "no recommended MCP servers"
+    - "no org catalog"
+    - "no file changes"
+    - "decision"
+    - "stop"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,24 @@
+id: regulatory-intent
+name: Regulatory intent extraction
+description: Ensures compliance/regulatory sources become sourced constraints, intent, autonomy boundaries, and gaps.
+tags:
+  - compliance
+  - regulatory
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only these fixtures; do not call WorkIQ, Jira, SharePoint, or session_store_sql, and do not edit files.
+    tagged_doc_sources:
+      - {category: "Compliance and regulatory", platform: "SharePoint", location: "legal-compliance/GDPR-DORA-SOC2", tag: "constraint", notes: "GDPR requires DSAR response within 30 days; DORA requires material ICT incident escalation; SOC 2 requires change evidence."}
+      - {category: "Product", platform: "Repo", location: "docs/product.md", tag: "intent", notes: "Customer trust outranks feature velocity for regulated workflows."}
+    Produce distilled_intent, include sourced compliance constraints, autonomy boundaries, and any gaps.
+expected:
+  output_contains:
+    - "distilled_intent"
+    - "GDPR"
+    - "DORA"
+    - "SOC"
+    - "Customer trust"
+    - "autonomy"
+    - "gaps"
+  outcomes:
+    - type: task_completed

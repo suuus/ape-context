@@ -1,0 +1,20 @@
+id: state-handoff
+name: Cross-skill state handoff
+description: Ensures the agent names the persisted state contracts consumed by downstream phases.
+tags:
+  - orchestration
+  - state
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not edit files or query live tools.
+    Explain how context-wizard passes state from detect through feedback, including the exact session_state keys and which downstream phase consumes each key.
+expected:
+  output_contains:
+    - "detected_stack"
+    - "discovered_servers"
+    - "scoping_decisions"
+    - "tagged_doc_sources"
+    - "healthcheck_results"
+    - "distilled_intent"
+  outcomes:
+    - type: task_completed
