@@ -56,7 +56,7 @@ CREATE TABLE IF NOT EXISTS session_state (key TEXT PRIMARY KEY, value TEXT);
 
 | Key | Written by | Read by | Content |
 |-----|-----------|---------|---------|
-| `detected_stack` | Phase 1 (Detect) | Phase 2 (Discover), Drift | JSON: `{languages[], frameworks[], ci_cd[], cloud[], mcp_servers[], scan_notes[]}` |
+| `detected_stack` | Phase 1 (Detect) | Phase 2 (Discover), Drift | JSON: `{languages[], frameworks[], ci_cd[], cloud[], mcp_servers[], copilot_config[], tool_references[], scan_notes[]}` |
 | `discovered_servers` | Phase 2 (Discover) | Phase 4 (Review), Phase 5 (Install) | JSON: array of `{name,badge,scope,category,install_cmd,status}` |
 | `scoping_decisions` | Phase 2 (Discover) | Phase 5 (Install) | JSON: map of server_name → "read-only" or "read-write" |
 | `unresolved_tools` | Phase 2 (Discover) | Phase 4 (Review), Phase 10 (Feedback) | JSON: array of tools without approved MCP coverage |
