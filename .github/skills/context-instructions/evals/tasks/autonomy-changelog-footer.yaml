@@ -1,0 +1,31 @@
+id: autonomy-changelog-footer
+name: Autonomy table and changelog footer
+description: Renders autonomy boundaries and links the intent changelog when present.
+tags: [autonomy, changelog]
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only fixtures and do not edit files.
+    Use context-instructions and show the relevant Enterprise Context sections.
+    Simulated distilled_intent:
+      intent: ["Protect customer data"]
+      constraints: ["Secrets stay in Key Vault"]
+      autonomy:
+        - {action: "Read documentation", level: "PROCEED", reason: "Read-only"}
+        - {action: "Deploy production", level: "ALWAYS ASK", reason: "Approval required"}
+        - {action: "Administer payroll", level: "NEVER", reason: "Out of domain"}
+      topology: ["Security approves auth modules"]
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"workiq":{"command":"npx","args":["@microsoft/workiq"]}}}
+    - path: .github/intent-changelog.md
+      content: |
+        # Intent Changelog
+        - 2026-05-19: initial setup
+expected:
+  output_contains:
+    - "PROCEED"
+    - "ALWAYS ASK"
+    - "NEVER"
+  outcomes:
+    - type: task_completed

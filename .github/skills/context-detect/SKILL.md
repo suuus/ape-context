@@ -1,53 +1,32 @@
 ---
 name: context-detect
-description: Scan the current project to detect the development stack, tools, and existing configuration
-user-invocable: true
+description: >-
+  DETECTION SKILL. Read-only scan of languages, frameworks, CI/CD, infra, cloud indicators, existing MCP servers, Copilot config, and tool references. USE FOR: detect project stack; inventory MCP servers; summarize repo tooling; prepare context-wizard discovery. DO NOT USE FOR: installing MCP servers, configuring auth, healthchecking, or editing files. REQUIRES: workspace file access. INVOKES: file search/read tools, git log, and SQL session_state persistence.
+license: MIT
+metadata:
+  version: 0.0.1
+  user-invocable: true
 ---
 
-Scan the project in the current working directory and report what you find.
+Scan the current workspace without modifying files.
 
-## What to scan
+## Steps
+1. Read `.github/copilot-instructions.md` if present.
+2. Scan package manifests: `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle`.
+3. Scan CI/CD and infra: workflows, Jenkins/GitLab/Azure/CircleCI files, Docker, Kubernetes, Terraform/Bicep/CloudFormation, `.azure/`, serverless, CDK, Pulumi.
+4. Read `.mcp.json` if present and list every configured MCP server; these are already installed and must be preserved.
+5. Inspect `.github/agents/`, `.github/skills/`, `.vscode/`, and recent git commits for Jira, Linear, ADO, Azure, or security references.
+6. Report source control, languages/frameworks, CI/CD, cloud, MCP servers, Copilot config, CLI tools, and conflicts. Missing categories are `none found`.
+7. Persist `detected_stack` in `session_state` using this schema:
 
-0. **Read current instructions**: Analyze the .github/copilot-instructions.md
-1. **Package files**: package.json, requirements.txt, go.mod, Cargo.toml, pom.xml, build.gradle
-2. **CI/CD**: .github/workflows/, Jenkinsfile, .gitlab-ci.yml, azure-pipelines.yml, .circleci/
-3. **Infrastructure**: bicep/terraform/cloudformation files, Dockerfile, docker-compose.yml, kubernetes manifests
-4. **Existing MCP config**: Read .mcp.json — list ALL currently configured MCP servers. These are already installed and should be preserved.
-5. **Existing Copilot config**: .github/copilot-instructions.md, .github/agents/, .github/skills/, and other relevant files under .github/ , .vscode/
-6. **Git history**: check recent commit messages for tool references (JIRA-123, LINEAR-456, ADO-789, etc.)
-7. **Cloud indicators**: .azure/, serverless.yml, cdk.json, pulumi files
-
-## Critical: existing MCP servers
-
-Read .mcp.json and list every server that's already configured. These are ALREADY WORKING and must be:
-- Preserved in all future phases
-- Recognized when matching tools to categories (e.g., "workiq" covers M365/SharePoint/Outlook)
-- Not duplicated by installing alternatives
-
-## What to report
-
-Summarize your findings in a clear list:
-- Source control platform
-- Languages and frameworks detected
-- CI/CD system
-- Cloud platform (if any)
-- Tool references found in git history
-- **Already configured MCP servers** (from .mcp.json)
-- Existing Copilot configuration
-- cli tools & scripts that are relevant in this context
-
-## Persist results
-
-Write the detected stack to the session store so downstream phases can retrieve it:
-
-```sql
-INSERT OR REPLACE INTO session_state (key, value) 
-VALUES ('detected_stack', '{json summary}');
+```json
+{"languages":[],"frameworks":[],"ci_cd":[],"cloud":[],"mcp_servers":[],"copilot_config":[],"tool_references":[],"scan_notes":[]}
 ```
 
-The JSON should include: languages detected, frameworks, CI/CD system, cloud platform, existing MCP servers from `.mcp.json`, and any tool references found in git history.
+Items include `name`, `source`, and optional `confidence`.
 
-Then mark this phase done:
-```sql
-UPDATE todos SET status = 'done' WHERE id = 'ctx-detect';
-```
+## Errors
+Unreadable or malformed files: note them in `scan_notes` and continue. If SQL persistence fails, report it; do not pretend state was saved.
+
+## Safety
+Never install, configure, delete, or edit files. If `context-wizard` invoked this skill and todo `ctx-detect` exists, mark it done; standalone runs stop after reporting.

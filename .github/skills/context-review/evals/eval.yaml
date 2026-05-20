@@ -1,0 +1,31 @@
+name: context-review-eval
+description: Tests review gate approve, revise, stop, empty-state reporting, and non-mutating behavior.
+skill: context-review
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-review
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: no_mutation_claims
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|we)\\s+(installed|configured|created|modified|wrote|edited|committed|pushed)\\b"
+tasks:
+  - "tasks/*.yaml"

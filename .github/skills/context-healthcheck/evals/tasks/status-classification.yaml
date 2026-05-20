@@ -1,0 +1,32 @@
+id: status-classification
+name: Classifies healthcheck outcomes
+description: Ensures simulated check results map to persisted statuses.
+tags:
+  - healthcheck
+  - status
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not call real MCP tools, retry, authenticate, or edit files.
+    Use context-healthcheck with simulated results:
+    github-mcp-server returns repositories successfully.
+    atlassian-jira returns 401.
+    workiq times out after 10 seconds.
+    local-test-server fails to start.
+    Emit healthcheck_results and a report.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{},"atlassian-jira":{},"workiq":{},"local-test-server":{}}}
+expected:
+  output_contains:
+    - "healthcheck_results"
+    - "github-mcp-server"
+    - "connected"
+    - "atlassian-jira"
+    - "auth"
+    - "workiq"
+    - "timeout"
+    - "local-test-server"
+    - "failed_to_start"
+  outcomes:
+    - type: task_completed

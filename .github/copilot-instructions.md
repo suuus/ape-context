@@ -40,7 +40,7 @@ This project uses **GitHub** for source control, **Jira** for project management
 | Category | Platform | Location |
 |---|---|---|
 | **Engineering docs** | SharePoint | `engineering` site — search via `workiq` |
-| **Security & compliance** | Backstage | Backstage service catalog |
+| **Security, compliance & regulatory** | Backstage / SharePoint | Backstage service catalog; legal/compliance sites via `workiq` |
 | **API specifications** | Repo | OpenAPI files in the repository |
 | **Runbooks & incidents** | Repo | `docs/runbooks/` directory |
 | **Architecture decisions** | SharePoint | Search via `workiq` |
@@ -49,7 +49,7 @@ This project uses **GitHub** for source control, **Jira** for project management
 When asked "how do we do X" or "where is the doc for Y":
 1. Search SharePoint first using `workiq-ask_work_iq`
 2. Check repo `docs/` directory for runbooks and API specs
-3. Check Backstage for security policies and service catalog
+3. Check Backstage and compliance/regulatory sources for security policies, audit requirements, and service catalog
 
 ---
 

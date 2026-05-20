@@ -1,0 +1,19 @@
+id: healthcheck-gate
+name: Healthcheck gating semantics
+description: Ensures only doc-source-required servers block distillation and auth failures route to configure.
+tags:
+  - orchestration
+  - healthcheck
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call real MCP tools or ask a live user. Use the words "blocking" and "non-blocking" when classifying failures.
+    In wizard mode, tagged_doc_sources requires SharePoint via workiq. healthcheck_results has workiq auth_failed, github-mcp-server connected, and atlassian-jira timeout. Explain what blocks context-distill and what follow-up the agent should describe.
+expected:
+  output_contains:
+    - "workiq"
+    - "context-distill"
+    - "context-configure"
+    - "github-mcp-server"
+    - "atlassian-jira"
+  outcomes:
+    - type: task_completed

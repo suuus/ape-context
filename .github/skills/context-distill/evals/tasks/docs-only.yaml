@@ -1,0 +1,24 @@
+id: docs-only
+name: Tagged docs with skipped history
+description: Ensures tagged_doc_sources can drive distillation when history is skipped.
+tags:
+  - docs
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only these fixtures; do not call WorkIQ, Jira, SharePoint, or session_store_sql, and do not edit files.
+    Simulated history result: skipped by user.
+    tagged_doc_sources:
+      - {category: "Security", platform: "Repo", location: "docs/security.md", tag: "constraint", notes: "Security review required for auth changes"}
+      - {category: "Engineering", platform: "Repo", location: "docs/dev.md", tag: "process", notes: "PRs reference Jira tickets"}
+      - {category: "Product", platform: "SharePoint", location: "strategy", tag: "intent", notes: "Reliability before feature velocity"}
+    Produce distilled_intent from the docs and mention history skipped.
+expected:
+  output_contains:
+    - "distilled_intent"
+    - "Reliability"
+    - "Security review"
+    - "Jira"
+    - "history"
+  outcomes:
+    - type: task_completed

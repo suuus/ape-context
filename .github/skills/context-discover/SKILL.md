@@ -1,126 +1,28 @@
 ---
 name: context-discover
-description: Find the best MCP servers for each tool in the user's stack using existing config, GitHub catalog, org catalog, and vendor docs
-user-invocable: true
+description: >-
+  DISCOVERY SKILL. Recommend MCP servers for detected_stack. Reuse .mcp.json coverage and persist scoped candidates. USE FOR: find MCP servers; map tools; avoid duplicates; prepare context-install. DO NOT USE FOR: stack detection, .mcp.json writes, auth, or healthchecks. REQUIRES: detected_stack or fallback scan. INVOKES: ask_user, file reads, catalog search.
+license: MIT
+metadata:
+  version: 0.0.1
+  user-invocable: true
 ---
 
-Based on the detected stack, find the best MCP servers for each tool category.
+## Inputs
+`detected_stack` comes from `context-detect`. If absent, quick-scan only manifests, workflows, `.mcp.json`, and cloud files.
 
-## FIRST: Check already-installed MCP servers
+## Steps
+1. Read `.mcp.json` first. Preserve installed servers. Known coverage: GitHub, M365 read (`workiq`), browser, Atlassian, Datadog, Azure. Verify uncertain coverage; never duplicate.
+2. Batch-confirm tools with `ask_user`; if headless, use detected defaults and mark `needs_confirmation`.
+3. For gaps, search trust order: official/GitHub 🐙, org catalog 🏢, vendor docs 🔰, community 👥. Org catalog supplies approved/blocked lists; prefer approved and exclude blocked.
+4. If installed read-only coverage exists but writes are needed, ask whether to add a write-capable server; otherwise reuse it.
+5. Scope recommended servers only: `read-write` -> `tools:["*"]`; `read-only` -> known get/list/search allowlist, else note manual restriction.
 
-Before searching for anything, check what's already in .mcp.json. Many tools are already covered:
+## Output
+Report installed, recommended, and unresolved items. Persist `discovered_servers[]` with `name,badge,scope,category,install_cmd,status`; `scoping_decisions{server:read-only|read-write}`; `unresolved_tools[]`.
 
-**Known MCP server coverage:**
-- `github-mcp-server` → GitHub (issues, PRs, code search, actions, repos) — read + write
-- `workiq` → Microsoft 365 (SharePoint, Outlook, OneDrive, Teams, Calendar) — **read-only** (search, query, retrieve). If write access is needed (create pages, send emails, update items), suggest an additional M365/Graph MCP server
-- `playwright` → Browser automation, testing, screenshots — read + write
-- `atlassian-mcp-server` → Jira, Confluence — read + write
-- `datadog-mcp-server` → Monitoring, logs, metrics — read-only
-- `azure-mcp-server` → Azure resources, deployments — read + write
+## Errors and mode
+No org catalog -> use public/vendor sources. Unreachable source -> try next. No match or only blocked servers -> unresolved. SQL failure -> state unsaved. Wizard may mark `ctx-discover` done; standalone only reports.
 
-When an existing server covers a category in read-only mode, ask the user: "workiq already lets you search SharePoint docs. Do you also need to create/edit content there?" If yes, search for a write-capable MCP server too.
-
-## Discovery Chain (for tools NOT already covered)
-
-### 1. GitHub / Official MCP Catalog
-- Search GitHub: `topic:mcp-server` + the vendor/tool name
-- Check github.com/modelcontextprotocol/servers for official listings
-- These get the 🐙 badge
-
-### 2. Organization Catalog
-- Try to read `{org}/.github/mcp-catalog.json` using `get_file_contents`
-- If it exists, prefer org-approved servers and respect the blocked list
-- These get the 🏢 badge
-
-If no org catalog exists, inform the user:
-> "No org-level MCP catalog was found at `{org}/.github/mcp-catalog.json`. An org catalog lets your security team maintain approved/blocked server lists and credential storage policies that apply across all repos. Consider creating one as your MCP adoption grows."
-
-Do not scaffold or create the catalog — just make the recommendation and move on.
-
-### 3. Vendor Documentation
-- Use `web_search` to find: "{tool name} MCP server official"
-- Use `web_fetch` to read install instructions from vendor docs
-- These get the 🔰 badge
-
-### 4. Community
-- Other GitHub results
-- These get the 👥 badge
-
-## Tool Scoping
-
-When presenting each recommended MCP server, ask the user whether they need **read-only** or **read+write** access. This determines the `tools` list in `.mcp.json`:
-
-- **Read+write** (default): `"tools": ["*"]`
-- **Read-only**: scope to get/search/list tools only
-
-Use `ask_user` for each server:
-```
-"Do you need write access to {tool} (create/update/delete), or is read-only enough?"
-→ Choices: ["Read + Write (Recommended)", "Read-only"]
-```
-
-Pass the scoping decision forward to Phase 5 (Install) so it can set the appropriate `tools` list.
-
-## Standalone invocation
-
-When invoked outside the wizard flow (no Phase 1 output available):
-
-1. Check the session store: `SELECT value FROM session_state WHERE key = 'detected_stack';`
-2. If state exists, use it as the basis for discovery
-3. If no state exists, run a lightweight detection inline: scan `package.json`, CI/CD workflow files, `.mcp.json`, and cloud indicators — enough to determine which categories are relevant
-4. Inform the user: "Running quick stack detection since Phase 1 hasn't been run. For a thorough scan, run `/context-detect` first."
-
-## Categories to cover
-
-For each category, use `ask_user` with **multi-select** (checkboxes, not radio buttons) so users can pick multiple tools. Always include an "Other (specify)" freeform option.
-
-Example schema for ask_user:
-```json
-{
-  "properties": {
-    "tools": {
-      "type": "array",
-      "title": "Which monitoring tools does your team use?",
-      "items": { "type": "string", "enum": ["Datadog", "Grafana", "App Insights", "PagerDuty", "None"] }
-    },
-    "other": {
-      "type": "string",
-      "title": "Other (specify)",
-      "description": "Any tools not listed above"
-    }
-  }
-}
-```
-
-Categories:
-- Source control
-- Project management (Jira, Linear, GitHub Issues, Azure Boards)
-- CI/CD
-- Cloud platform
-- Monitoring / observability
-- Documentation / wiki (SharePoint → workiq, Confluence → atlassian-mcp-server)
-- Security scanning
-- Communication (Teams → workiq, Slack → slack-mcp-server)
-
-**Important**: When the user selects a service like SharePoint, Teams, Outlook, OneDrive — check if `workiq` is already installed. If so, it already covers that service. Same logic for all multi-service MCP servers.
-
-For each confirmed tool, present the best match with its trust badge and whether it's already installed.
-
-## Persist decisions
-
-After all categories are confirmed, write the decisions to the session store so Phase 5 (Install) can retrieve them:
-
-```sql
-INSERT OR REPLACE INTO session_state (key, value) 
-VALUES ('scoping_decisions', '{json map of server_name → "read-only" or "read-write"}');
-
-INSERT OR REPLACE INTO session_state (key, value) 
-VALUES ('discovered_servers', '{json array of {name, badge, scope, category, install_cmd}}');
-```
-
-This ensures Install can retrieve scoping decisions even if conversation context is lost.
-
-Then mark this phase done:
-```sql
-UPDATE todos SET status = 'done' WHERE id = 'ctx-discover';
-```
+## Safety
+Do not install, configure auth, or edit `.mcp.json`.

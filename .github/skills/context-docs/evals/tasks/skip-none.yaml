@@ -1,0 +1,25 @@
+id: skip-none
+name: Handles skipped and missing categories
+description: Ensures None/Skip is accepted without inventing a documentation source.
+tags:
+  - docs
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not use external systems or edit files.
+    Use context-docs with these answers:
+    Runbooks/incidents: None yet.
+    Architecture decisions: Skip for now.
+    Processes/ceremonies: repo docs/process.md tagged process.
+    Explain how skipped categories are represented and emit tagged_doc_sources.
+expected:
+  output_contains:
+    - "tagged_doc_sources"
+    - "Runbooks"
+    - "None"
+    - "Skip"
+    - "Processes"
+    - "docs/process.md"
+    - "process"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,21 @@
+id: compliance-regulatory-flow
+name: Compliance regulatory discovery to intent
+description: Ensures the agent orchestrates compliance/regulatory docs through discovery, distillation, instructions, and feedback.
+tags:
+  - compliance
+  - orchestration
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call live systems or edit files.
+    A user asks context-wizard to discover compliance and regulatory documentation, extract intent, and turn it into guardrails. Explain the phases, state keys, and safety gates involved.
+expected:
+  output_contains:
+    - "context-docs"
+    - "compliance"
+    - "regulatory"
+    - "tagged_doc_sources"
+    - "context-distill"
+    - "distilled_intent"
+    - "context-instructions"
+  outcomes:
+    - type: task_completed

@@ -1,45 +1,24 @@
 ---
 name: context-review
-description: Present the full setup plan for user confirmation before making changes
-user-invocable: true
+description: >-
+  REVIEW GATE SKILL. Present the proposed context-wizard setup plan for explicit user approval before installation or file changes. USE FOR: review MCP recommendations; confirm scoping and generated files; approve, revise, or stop setup. DO NOT USE FOR: discovering servers, editing .mcp.json, configuring auth, or generating instructions. REQUIRES: discovered_servers or a plan summary. INVOKES: ask_user only.
+license: MIT
+metadata:
+  version: 0.0.1
+  user-invocable: true
 ---
 
-Present a complete summary of everything that will be configured. The user must confirm before you proceed.
+Present a confirmation gate; do not make changes.
 
-## What to show
+## Steps
+1. Show planned MCP servers with badge, coverage, scope, auth needs, install command, and whether already installed.
+2. Show skills/agents to enable, instruction sections to generate, `.mcp.json` entries, files to create/modify, and org-policy status.
+3. Empty states are valid; explicitly say "no recommended MCP servers", "no org catalog", and "no file changes" when true.
+4. Ask with `ask_user`: Approve, Revise, or Stop.
+5. Approve -> pass the plan forward. Revise -> name the phase to revisit (`context-discover`, `context-docs`, etc.). Stop -> say "do not proceed".
 
-### MCP Servers to install
-For each server, show:
-- Name and trust badge (🏢 🐙 🔰 👥)
-- What it covers (e.g., "Jira + Confluence")
-- Key tools it provides
-- Auth requirements (e.g., "needs API token")
+## Output
+Return `{decision:"approve|revise|stop", revise_phase?, notes?}`. Wizard mode may mark `ctx-review` done only after Approve; standalone stops after reporting.
 
-### Skills to enable
-List any skills that match the detected stack.
-
-### Copilot instructions to generate
-Preview the sections that will be added to `.github/copilot-instructions.md`:
-- Enterprise context section
-- Per-tool instructions
-- Cross-tool workflows
-
-### Configuration changes
-- Entries to add to `.mcp.json`
-- Files to create or modify
-
-### Org policy compliance (if org catalog was found)
-- All servers on the approved list? ✅
-- Any blocked servers avoided? ✅
-- Credential storage matches org policy?
-
-## Confirmation
-
-Use `ask_user` with a clear yes/no: "Ready to proceed with this setup?"
-
-If the user wants changes, go back to the relevant phase.
-
-Then mark this phase done:
-```sql
-UPDATE todos SET status = 'done' WHERE id = 'ctx-review';
-```
+## Safety
+Never install, configure, edit, commit, or push.

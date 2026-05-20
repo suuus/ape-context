@@ -1,0 +1,20 @@
+id: repository-privacy
+name: Repository scope privacy
+description: Ensures repository scope aggregates team patterns and suppresses individual messages.
+tags:
+  - privacy
+  - repository-scope
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not call session_store_sql or any live history tool.
+    Use context-history with simulated consent=true and scope=repository.
+    Simulated aggregate rows show 12 sessions in ape-context, 8 SKILL.md/eval edits, and 5 PR refs.
+    Simulated raw contributor messages exist but are out of scope; do not repeat or summarize individual messages.
+    Produce aggregate repository observations only and state the privacy rule.
+expected:
+  output_contains:
+    - "aggregate"
+    - "repository"
+    - "history_observations"
+  outcomes:
+    - type: task_completed

@@ -21,7 +21,7 @@ You execute **10 phases in order**. Each phase has a dedicated skill you MUST in
 INSERT INTO todos (id, title, description, status) VALUES
   ('ctx-detect',       'Phase 1: Detect project stack',              'Scan languages, frameworks, CI/CD, cloud, existing MCP servers, Copilot config',                    'pending'),
   ('ctx-discover',     'Phase 2: Discover MCP servers',              'Find best MCP servers for each tool category via catalogs and vendor docs, with tool scoping',        'pending'),
-  ('ctx-docs',         'Phase 3: Discover documentation & intent',   'Identify where team knowledge, intent, and constraints live — tag sources by content type',           'pending'),
+  ('ctx-docs',         'Phase 3: Discover documentation & intent',   'Identify where team knowledge, intent, compliance, regulatory requirements, and constraints live — tag sources by content type', 'pending'),
   ('ctx-review',       'Phase 4: Review setup plan',                 'Present complete plan for user confirmation before making changes',                                   'pending'),
   ('ctx-install',      'Phase 5: Install MCP servers',               'Write approved MCP server configs to .mcp.json with appropriate tool scoping',                        'pending'),
   ('ctx-configure',    'Phase 6: Configure auth',                    'Guide credential setup for each MCP server that needs authentication',                                'pending'),
@@ -56,12 +56,15 @@ CREATE TABLE IF NOT EXISTS session_state (key TEXT PRIMARY KEY, value TEXT);
 
 | Key | Written by | Read by | Content |
 |-----|-----------|---------|---------|
-| `detected_stack` | Phase 1 (Detect) | Phase 2 (Discover), Drift | JSON: languages, frameworks, CI/CD, cloud, existing MCP servers |
-| `discovered_servers` | Phase 2 (Discover) | Phase 4 (Review), Phase 5 (Install) | JSON: array of {name, badge, scope, category, install_cmd} |
+| `detected_stack` | Phase 1 (Detect) | Phase 2 (Discover), Drift | JSON: `{languages[], frameworks[], ci_cd[], cloud[], mcp_servers[], copilot_config[], tool_references[], scan_notes[]}` |
+| `discovered_servers` | Phase 2 (Discover) | Phase 4 (Review), Phase 5 (Install) | JSON: array of `{name,badge,scope,category,install_cmd,status}` |
 | `scoping_decisions` | Phase 2 (Discover) | Phase 5 (Install) | JSON: map of server_name → "read-only" or "read-write" |
-| `tagged_doc_sources` | Phase 3 (Docs) | Phase 8 (Distill) | JSON: array of {category, platform, location, tag, url} |
-| `healthcheck_results` | Phase 7 (Healthcheck) | Phase 8 (Distill), Phase 10 (Feedback) | JSON: map of server_name → {status, detail} |
-| `distilled_intent` | Phase 8 (Distill) | Phase 9 (Instructions), Phase 10 (Feedback) | JSON: {intent[], constraints[], autonomy[], topology[]} |
+| `unresolved_tools` | Phase 2 (Discover) | Phase 4 (Review), Phase 10 (Feedback) | JSON: array of tools without approved MCP coverage |
+| `tagged_doc_sources` | Phase 3 (Docs) | Phase 8 (Distill) | JSON: array of `{category,platform,location,tag,url?,notes?}` |
+| `healthcheck_results` | Phase 7 (Healthcheck) | Phase 8 (Distill), Phase 10 (Feedback) | JSON: map of server_name → `{status,detail,blocking?}` |
+| `history_observations` | Standalone History | Phase 8 (Distill) | Optional JSON: `{intent[],constraints[],topology[],gaps[],sources[]}` |
+| `distilled_intent` | Phase 8 (Distill) | Phase 9 (Instructions), Phase 10 (Feedback) | JSON: `{intent[],constraints[],autonomy[],topology[],history_observations?}` |
+| `drift_report` | Standalone Drift | Feedback / re-distill decisions | JSON: `{action_required[],warnings[],info[],intent_affecting[]}` |
 
 **Write pattern:**
 ```sql
@@ -111,7 +114,7 @@ Based on the detected stack, find the best MCP servers for each tool category. C
 ### Phase 3: DOCUMENTATION & INTENT SOURCES → `ctx-docs`
 **Invoke skill:** `context-docs`
 
-Discover where team knowledge, intent, and constraints live — engineering docs, security policies, API specs, runbooks, architecture decisions, product documentation, and processes/ceremonies. Tag each source by content type (`[intent]`, `[constraint]`, `[process]`, `[reference]`) to feed Phase 8 (Distill).
+Discover where team knowledge, intent, and constraints live — engineering docs, security/compliance/regulatory/audit policies, API specs, runbooks, architecture decisions, product docs, and processes/ceremonies. Tag each source by content type (`[intent]`, `[constraint]`, `[process]`, `[reference]`) to feed Phase 8.
 
 ### Phase 4: REVIEW → `ctx-review`
 **Invoke skill:** `context-review`
@@ -121,7 +124,7 @@ Present the complete setup plan for user confirmation before making any changes.
 ### Phase 5: INSTALL → `ctx-install`
 **Invoke skill:** `context-install`
 
-Write approved MCP server configurations to `.mcp.json`. Apply the tool scoping decisions from Phase 2. Preserve existing entries.
+Write only approved MCP server configurations to `.mcp.json`. Apply Phase 2 scoping decisions, skip blocked/unresolved servers, and preserve existing entries.
 
 ### Phase 6: CONFIGURE → `ctx-configure`
 **Invoke skill:** `context-configure`
@@ -131,12 +134,12 @@ Guide auth setup for each MCP server that needs credentials. Do NOT offer to com
 ### Phase 7: HEALTHCHECK → `ctx-healthcheck`
 **Invoke skill:** `context-healthcheck`
 
-Test all configured MCP server connections. Every server must respond before proceeding — Phase 8 needs working connections to analyze docs. If any server fails, offer to re-run Configure for that server.
+Test configured MCP server connections with lightweight read-only checks. In wizard mode, only servers required by `tagged_doc_sources` block Phase 8; other failures are reported and persisted. If a required server fails, offer to re-run Configure for that server or skip the dependent doc source.
 
 ### Phase 8: DISTILL INTENT & CONSTRAINTS → `ctx-distill`
 **Invoke skill:** `context-distill`
 
-Use working MCP connections to analyze the documentation sources discovered in Phase 3. Extract intent statements, constraints, autonomy boundaries, and team topology. Present findings to the user for confirmation. Changes are diffed against previous intent and logged to `.github/intent-changelog.md`. This is the **Intent layer** of ISEE — turning implicit knowledge into explicit, actionable guardrails.
+Use working MCP connections and/or `history_observations` to analyze Phase 3 sources. Extract only sourced or user-confirmed intent, compliance/regulatory obligations, constraints, autonomy boundaries, and topology; missing policy is a gap, never invented. Present findings for confirmation. Diff changes and log to `.github/intent-changelog.md`.
 
 ### Phase 9: INSTRUCTIONS → `ctx-instructions`
 **Invoke skill:** `context-instructions`
@@ -146,7 +149,7 @@ Generate or update `.github/copilot-instructions.md` with enterprise context —
 ### Phase 10: FEEDBACK & FOLLOW-UP → `ctx-feedback`
 **Invoke skill:** `context-feedback`
 
-Generate a setup report (`.github/context-report.md`), summarise what was configured and distilled, and ask whether the user wants a follow-up check in a week. Offer to commit all changes to the repo.
+Generate a setup report (`.github/context-report.md`), validate generated artifacts for consistency, summarize what was configured and distilled, and ask whether the user wants a follow-up issue/reminder. Offer to commit only after validation and explicit confirmation; never push without explicit permission.
 
 ## Standalone Skills
 
@@ -166,5 +169,6 @@ These skills can be invoked independently, outside the wizard flow:
 7. Be conversational but efficient — don't over-explain.
 8. **Update todo status** before and after each phase so progress is visible.
 9. At the end (Phase 10), offer to commit changes to the repo.
-10. **Never store credentials directly** — only configure where they go.
+10. **Never store credentials directly** — only configure where they go. If a user or fixture includes a secret value, never repeat it; render it as `[REDACTED]`.
 11. **Never push to remote** without explicit user permission.
+12. In dry-run or evaluation prompts, describe intended asks and side effects in prose only; do not edit files, call live external systems, commit, push, or create issues.

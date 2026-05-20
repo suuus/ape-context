@@ -1,0 +1,21 @@
+id: all-mcp-servers-documented
+name: All MCP servers documented
+description: Documents every configured MCP server, including unknown coverage.
+tags: [mcp, inventory]
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only fixtures and do not edit files.
+    Use context-instructions and show the MCP Servers section. Every server in .mcp.json must appear even if coverage is unknown.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"command":"docker","args":["github/server"]},"workiq":{"command":"npx","args":["@microsoft/workiq"]},"atlassian-jira":{"command":"npx","args":["jira-mcp"]},"internal-runbooks":{"command":"node","args":["server.js"]}}}
+expected:
+  output_contains:
+    - "github-mcp-server"
+    - "workiq"
+    - "atlassian-jira"
+    - "internal-runbooks"
+    - "unknown"
+  outcomes:
+    - type: task_completed

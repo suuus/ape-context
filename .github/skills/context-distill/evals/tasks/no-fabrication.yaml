@@ -1,0 +1,26 @@
+id: no-fabrication
+name: Missing deployment policy is flagged
+description: Ensures absent policy is reported as a gap, not invented.
+tags:
+  - no-fabrication
+  - gaps
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the fixtures and do not call live tools or edit files.
+    tagged_doc_sources:
+      - {category: "Engineering", platform: "Repo", location: "docs/review.md", tag: "process", notes: "All PRs need one reviewer"}
+    history_observations:
+      intent: ["Improve review quality"]
+      constraints: []
+      topology: []
+      gaps: []
+      sources: ["simulated"]
+    The user asks whether there is a deployment policy. Distill and handle the missing policy. Do not invent any deployment rule; state it as a gap.
+expected:
+  output_contains:
+    - "deployment policy"
+    - "gap"
+    - "reviewer"
+    - "invent"
+  outcomes:
+    - type: task_completed

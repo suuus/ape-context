@@ -1,0 +1,22 @@
+id: mcp-preservation
+name: MCP server preservation
+description: Ensures already configured MCP servers are inventoried and treated as existing working entries.
+tags:
+  - mcp
+  - preservation
+inputs:
+  prompt: |
+    This is a dry-run evaluation: scan only the eval workspace files, do not search outside it, and do not edit files.
+    Use the context-detect skill. Focus on existing MCP servers and how downstream phases should treat them.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]},"workiq":{"type":"local","tools":["ask_work_iq"]}}}
+expected:
+  output_contains:
+    - "github-mcp-server"
+    - "workiq"
+    - "already"
+    - "preserve"
+  outcomes:
+    - type: task_completed

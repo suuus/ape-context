@@ -1,0 +1,25 @@
+id: approve-plan
+name: Approves complete setup plan
+description: Ensures an approved plan is summarized without performing install work.
+tags:
+  - review
+  - approve
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files, install servers, or configure auth.
+    Use context-review for this plan and simulate that the user chooses Approve:
+    Servers: github-mcp-server (GitHub, tools search_code/list_issues, auth gh), atlassian-jira (Jira, auth API token).
+    Files: .mcp.json and .github/copilot-instructions.md.
+    Org catalog: github approved, jira approved.
+    Return the decision object.
+expected:
+  output_contains:
+    - "github-mcp-server"
+    - "atlassian-jira"
+    - ".mcp.json"
+    - "copilot-instructions"
+    - "approved"
+    - "decision"
+    - "approve"
+  outcomes:
+    - type: task_completed

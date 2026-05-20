@@ -1,0 +1,41 @@
+id: report-generation
+name: Report generation includes core sections
+description: Ensures report content covers servers, docs, intent, and healthcheck from fixtures.
+tags:
+  - report
+  - happy-path
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Use only eval workspace fixtures. Do not create, edit, or delete files; answer in prose only. Do not create issues, commits, or pushes.
+    Use context-feedback with these supplied session values:
+    healthcheck_results={"github-mcp-server":{"status":"connected","detail":"listed repositories"},"workiq":{"status":"connected","detail":"answered docs query"}}
+    tagged_doc_sources=[{"category":"Engineering docs","platform":"SharePoint","location":"engineering","tag":"reference"},{"category":"Security","platform":"Backstage","location":"catalog","tag":"constraint"}]
+    distilled_intent={"intent":["Prioritize reliability"],"constraints":["No secrets in repo"],"autonomy":[{"action":"Read docs","level":"PROCEED","reason":"read-only","source":"docs"}]}
+    Draft the final report summary and validation result. In your response, explicitly list the literal server names, doc category, intent statement, Healthcheck section, and context-report.md path from the fixtures.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"tools":["*"]},"workiq":{"tools":["ask_work_iq"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        # Copilot Instructions
+        ## Enterprise Context
+        ### MCP Servers
+        github-mcp-server handles GitHub. workiq handles M365 docs.
+        | Action | Level | Notes |
+        |---|---|---|
+        | Read docs | ✅ PROCEED | read-only |
+        > Intent changelog: [.github/intent-changelog.md](intent-changelog.md)
+    - path: .github/intent-changelog.md
+      content: |
+        # Intent Changelog
+expected:
+  output_contains:
+    - "github-mcp-server"
+    - "workiq"
+    - "Engineering docs"
+    - "Prioritize reliability"
+    - "Healthcheck"
+    - "context-report.md"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,24 @@
+id: existing-mcp-reuse
+name: Existing MCP reuse
+description: Ensures installed MCP servers are reused instead of duplicated.
+tags:
+  - existing-coverage
+  - mcp
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided files, do not search live catalogs, and do not edit files.
+    Use context-discover. detected_stack includes GitHub source control and M365 SharePoint/Teams read-only docs. The user only needs read access.
+    Explain recommendations and the persisted discovery output.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]},"workiq":{"type":"local","tools":["ask_work_iq"]}}}
+expected:
+  output_contains:
+    - "github-mcp-server"
+    - "workiq"
+    - "reuse"
+    - "no duplicate"
+    - "discovered_servers"
+  outcomes:
+    - type: task_completed

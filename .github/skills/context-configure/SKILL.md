@@ -1,53 +1,27 @@
 ---
 name: context-configure
-description: Guide the user through authentication setup for each MCP server, test connections
-user-invocable: true
+description: >-
+  CONFIGURATION SKILL. Configure authentication for installed MCP servers by choosing safe credential storage, adding .mcp.json env references, and testing read-only connectivity. USE FOR: set up MCP credentials; fix broken or expired MCP auth; reconnect after token expiry; add env vars to .mcp.json. DO NOT USE FOR: discovering or installing MCP servers, healthcheck-only requests, or writing or committing secrets. REQUIRES: .mcp.json already contains server entries. INVOKES: ask_user for storage choice, file tools for config edits, and read-only checks for connectivity.
+license: MIT
+metadata:
+  version: 0.0.1
+  user-invocable: true
 ---
 
-For each installed MCP server that requires authentication, guide the user through credential setup.
+Configure auth only for MCP servers already present in `.mcp.json`.
 
-## Process
+## Steps
+1. Read `.mcp.json`. If missing, report that no installed MCP servers can be configured and stop.
+2. Determine which servers need auth from known requirements, existing `env` placeholders, or vendor docs. Skip no-auth servers; if none remain, report that and stop.
+3. Explain needed credential names and token-source links when known; otherwise point to vendor docs.
+4. Ask with `ask_user` where to store credentials. Default to org policy when present; otherwise prefer shell env vars. If unavailable, ask for another option.
+5. Configure references only: export commands, gitignored `.env` placeholders, Key Vault/keychain commands, and `.mcp.json` entries like `"JIRA_TOKEN": "${JIRA_TOKEN}"`.
+6. Test one lightweight read-only operation per configured server. On failure, report auth failed, ask whether to retry setup once or leave it for healthcheck, and do not mark it connected.
+7. Summarize configured, skipped, and failed servers. Standalone runs stop there. If `context-wizard` invoked this skill and its todo exists, mark it done and continue to `context-healthcheck`.
 
-For each server that needs auth:
+## Examples
+- "Set up Jira MCP auth" -> ask storage, add env refs, test read-only.
+- "401 after setup" -> offer one retry or healthcheck handoff.
 
-1. **Explain** what credentials are needed:
-   - "The Atlassian MCP server needs your Jira instance URL and an API token"
-   - Link to the vendor's token creation page if possible
-
-2. **Ask where to store credentials** (use `ask_user`):
-   - Environment variable (recommended for local dev)
-   - `.env` file (gitignored, local only)
-   - Azure Key Vault (enterprise)
-   - System keychain (macOS Keychain / Windows Credential Manager)
-   - If an org catalog specifies `credential-storage`, default to that
-
-3. **Guide setup** based on their choice:
-   - Env var: tell them which variable name to set and the export command
-   - .env: create or update .env file, ensure it's in .gitignore
-   - Key Vault: provide az keyvault commands
-   - Keychain: provide platform-specific instructions
-
-4. **Update .mcp.json** if the server needs env vars in its config:
-   ```json
-   "env": {
-     "JIRA_URL": "${JIRA_URL}",
-     "JIRA_TOKEN": "${JIRA_TOKEN}"
-   }
-   ```
-
-5. **Test the connection** if possible:
-   - Try to invoke a simple read-only tool from the server
-   - Report: ✅ Connected or ❌ Auth failed — check credentials
-
-## Important
-- We NEVER store credentials directly — only configure where they go
-- Never echo or log credential values
-- Always ensure .env is in .gitignore before writing to it
-- Respect org credential storage policy if one exists
-
-Then mark this phase done:
-```sql
-UPDATE todos SET status = 'done' WHERE id = 'ctx-configure';
-```
-
-When all servers are configured, summarise the auth setup and move to Phase 7 (Healthcheck) — do NOT offer to commit here. Committing happens in Phase 10 (Feedback).
+## Error handling and safety
+Never store or echo secrets. Before editing `.env`, confirm `.gitignore` excludes `.env` and `.env.*`; add those ignore rules first if missing.

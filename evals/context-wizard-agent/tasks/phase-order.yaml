@@ -1,0 +1,18 @@
+id: phase-order
+name: Phase order and todo dependencies
+description: Ensures the agent plans the full context-wizard phase sequence and dependency chain before acting.
+tags:
+  - orchestration
+  - todos
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not edit files or call live systems.
+    Act as the context-wizard agent starting a fresh setup. Describe the todo/dependency plan and the skill invocation order you would follow. Use the exact skill names for each phase.
+expected:
+  output_contains:
+    - "context-detect"
+    - "context-discover"
+    - "context-review"
+    - "context-feedback"
+  outcomes:
+    - type: task_completed
