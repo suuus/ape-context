@@ -1,0 +1,17 @@
+id: deterministic-fingerprint
+name: Deterministic context fingerprint
+description: Requires quality review to use the canonical fingerprint helper.
+tags: [cafes, fingerprint, helper]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files.
+    Use context-quality and explain how artifact_fingerprint is obtained. Include the exact helper, subcommand, and target path. If the helper fails, explain the quality status.
+expected:
+  output_contains:
+    - "context_artifacts.py"
+    - "fingerprint"
+    - ".github/copilot-instructions.md"
+    - "artifact_fingerprint"
+    - "incomplete"
+  outcomes:
+    - type: task_completed

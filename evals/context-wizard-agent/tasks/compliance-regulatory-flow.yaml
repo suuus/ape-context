@@ -1,21 +1,16 @@
 id: compliance-regulatory-flow
 name: Compliance regulatory discovery to intent
-description: Ensures the agent orchestrates compliance/regulatory docs through discovery, distillation, instructions, and feedback.
+description: Ensures the agent orchestrates compliance/regulatory docs through discovery, distillation, instructions, CAFE(S), ratification, and feedback.
 tags:
   - compliance
   - orchestration
 inputs:
   prompt: |
-    This is a dry-run agent-level Waza eval. Do not call live systems or edit files.
-    A user asks context-wizard to discover compliance and regulatory documentation, extract intent, and turn it into guardrails. Explain the phases, state keys, and safety gates involved.
+    This is a dry-run agent-level Waza eval. Do not call tools, live systems, or edit files.
+    Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    If populated, entries use only these keys: state_handoffs={key,writer,readers}; gates={gate,status,blocks,recovery}. phase_order contains exact context-* skill names. Never invent alternate keys.
+    Set scenario to "compliance-regulatory-flow". phase_order is context-docs, context-distill, context-decisions, context-structure, context-instructions, context-quality, context-ratify, context-feedback. Include state handoffs tagged_doc_sources, distilled_intent, decision_candidates, decision_sources, structure_candidates, decision_drafts, imported_decisions, structure_drafts, context_quality_review, decision_records, structure_records, execution_manifest, context_ratification, and context_evidence. Gate context-quality has status="ready", blocks=["context-ratify"], recovery=[]; gate context-ratify has status="blocked", blocks=["context-feedback"], recovery=[]. Leave service_health, artifact_actions, approvals, and planned side effects empty.
 expected:
-  output_contains:
-    - "context-docs"
-    - "compliance"
-    - "regulatory"
-    - "tagged_doc_sources"
-    - "context-distill"
-    - "distilled_intent"
-    - "context-instructions"
   outcomes:
     - type: task_completed

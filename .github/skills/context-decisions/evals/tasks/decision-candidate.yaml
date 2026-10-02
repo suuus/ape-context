@@ -1,0 +1,12 @@
+id: decision-candidate
+name: Draft explicit security decision
+description: Converts an explicit sourced choice into a proposed canonical draft without claiming approval.
+tags:
+  - decisions
+  - security
+inputs:
+  prompt: |
+    Dry run only; do not call tools or write files. decision_candidates contains an authoritative policy choice: production deployments must use a blocking security review rather than an advisory review. Explain the proposed context-decisions flow, canonical draft fields, alternatives and four-domain trade-offs, deterministic validation/fingerprinting, state written, and why the result remains inactive until human ratification.
+expected:
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,24 @@
+id: fidelity-remediation
+name: Unsourced mandatory constraint routes to distill
+description: Ensures unsupported mandatory instructions fail Fidelity and route to context-distill.
+tags: [cafes, fidelity, remediation]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Use only fixtures and do not edit files.
+    Use context-quality. The generated instructions contain a mandatory production rule that is absent from distilled_intent. Explain the evidence, fail Fidelity, and route remediation to context-distill before regeneration and re-review.
+    distilled_intent={"intent":["Improve deployment reliability"],"constraints":[],"autonomy":[],"topology":[],"gaps":[]}
+  files:
+    - path: .github/copilot-instructions.md
+      content: |
+        # Copilot Instructions
+        ## Enterprise Context
+        All production changes MUST be approved by the Finance Director.
+expected:
+  output_contains:
+    - "fidelity"
+    - "fail"
+    - "context-distill"
+    - "context-instructions"
+    - "context-quality"
+  outcomes:
+    - type: task_completed

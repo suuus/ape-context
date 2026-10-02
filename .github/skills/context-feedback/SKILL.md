@@ -1,28 +1,44 @@
 ---
 name: context-feedback
 description: >-
-  FEEDBACK SKILL. Context-wizard finalizer: report evidence, validate artifacts, and gate issue/commit. USE FOR: final report; consistency checks; reminder/commit offers. DO NOT USE FOR: earlier phases, pushes, unconfirmed issues/commits, or credentials. REQUIRES: healthcheck_results, tagged_doc_sources, distilled_intent, .mcp.json, instructions. INVOKES: file tools, ask_user, confirmed git/GitHub.
+  AERP FINALIZER. USE FOR: Phase 14, close ISEE, sanitize and validate reports.
+  DO NOT USE FOR: earlier phases, pushes,
+  credentials, unconfirmed effects, or false success. INVOKES: profile CLIs,
+  helper, ask_user, confirmed git/GitHub.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 
-## Inputs
-Use `healthcheck_results` server statuses/details, `tagged_doc_sources` categories/platforms/locations/tags, and `distilled_intent` intent/constraints/autonomy. Load from state/fixtures; read `.mcp.json`, instructions, and changelog. Missing/malformed inputs are validation issues.
+1. Load state; malformed data blocks.
+2. Draft `.github/context-report.md` with tools, Intent, Healthcheck, ADRP/ASRP,
+   `CAFE(S)`, ratification, and gaps.
+   Replace secrets with `[REDACTED]`; never write unsanitized output. Run:
 
-## Steps
-1. Write `.github/context-report.md` (dry-runs draft only): MCP servers, docs, intent/constraints/autonomy, healthcheck, generated files. Redact credentials/env values.
-2. Validate in order before follow-up/commit: `.mcp.json`/instructions server parity; autonomy table matches; existing changelog linked; report counts match actuals; listed files exist.
-3. If issues exist, list each and include "ask before commit"; fix only confirmed generated sections; do not commit until user confirms fix or proceed.
-4. Ask whether to create a follow-up issue. Create only after explicit confirmation; dry-runs describe it instead.
-5. Ask whether to commit. After confirmation, stage only wizard files: `.mcp.json`, `.github/copilot-instructions.md`, `.github/context-report.md`, `.github/intent-changelog.md`. Commit message: `chore: configure enterprise context layer via context-wizard`. Never push without explicit permission.
-6. Summarize counts, validation status, follow-up/commit choices, and report path.
+```bash
+python3 <context_artifacts.py> sanitize \
+  --input <draft> \
+  --output .github/context-report.md \
+  --mcp-config .mcp.json
+```
 
-## Examples
-- Mismatch: ask fix before commit.
-- Declined/dry-run: skip/describe side effects; create nothing.
-
-## Errors
-- Missing `.mcp.json`/partial data: partial report, validation issues; no commit until confirmed.
-- Standalone: summarize/stop. Wizard todo may mark `ctx-feedback` done.
+3. Capture AERP records: healthcheck `observation`, quality
+   `assessment`, ratification `approval`, finalization `outcome`. Run `aerp new`,
+   bind decisions with `aerp bind`, bind Structure with
+   `aerp bind-structure`, then `aerp validate` and `aerp verify`. Store under
+   `.github/evidence/context-bootstrap/`; persist `context_evidence`. Preserve
+   failed, skipped, and inconclusive results.
+4. Validate and name MCP mismatches, changelog, quality, ratification, ADRP
+   imports, ASRP duties, AERP bindings/bytes, counts, and paths.
+5. List issues; ask before fixes. Route stale gates to their owning phase.
+6. Follow-up requires confirmation. Name both paths: `declines: skip` and
+   `confirms: create issue`.
+7. Confirm commits. Stage only `.mcp.json`,
+   `.github/copilot-instructions.md`, `.github/context-report.md`,
+   `.github/intent-changelog.md`, `.github/context-ratification.md`, decisions,
+   structures, manifest, and Evidence. Use
+   `chore: configure enterprise context layer via context-wizard`.
+   Decline means `do not commit`. Never push without separate `push permission`.
+8. Remove draft; report validation, paths, and bindings.
+Always name the persisted Evidence key literally as `context_evidence`.

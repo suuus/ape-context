@@ -4,7 +4,7 @@ description: >-
   DOCUMENTATION DISCOVERY SKILL. Identify team docs, policy, compliance/regulatory/audit, API, runbook, architecture, product, and process sources; tag each source for distillation. USE FOR: map docs sources; classify intent/constraint/process/reference material; prepare context-distill. DO NOT USE FOR: reading/analyzing document content, generating instructions, or configuring MCP servers. REQUIRES: user answers or known repo docs. INVOKES: ask_user and SQL persistence.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

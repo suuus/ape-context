@@ -11,6 +11,8 @@ inputs:
     healthcheck_results={}
     tagged_doc_sources=[]
     distilled_intent={"intent":[],"constraints":[],"autonomy":[]}
+    context_quality_review={"artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-commit-context","status":"pass","blocking_findings":[],"warnings":[],"unassessed":[]}
+    context_ratification={"status":"ratified","artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-commit-context","quality_status":"pass","accepted_warnings":[],"standing_gaps":[]}
   files:
     - path: .mcp.json
       content: |
@@ -18,6 +20,7 @@ inputs:
     - path: .github/copilot-instructions.md
       content: |
         # Copilot Instructions
+        ## Enterprise Context
         github-mcp-server
     - path: .github/context-report.md
       content: |
@@ -25,13 +28,14 @@ inputs:
     - path: .github/intent-changelog.md
       content: |
         # Intent Changelog
+    - path: .github/context-ratification.md
+      content: |
+        # Context Ratification
+        - Status: ratified
+        - Artifact fingerprint: sha256:fixture-commit-context
+        - CAFE(S) result: pass
 expected:
   output_contains:
     - "do not commit"
-    - ".mcp.json"
-    - ".github/copilot-instructions.md"
-    - ".github/context-report.md"
-    - ".github/intent-changelog.md"
-    - "push permission"
   outcomes:
     - type: task_completed

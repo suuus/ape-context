@@ -4,7 +4,7 @@ description: >-
   DISCOVERY SKILL. Recommend MCP servers for detected_stack. Reuse .mcp.json coverage and persist scoped candidates. USE FOR: find MCP servers; map tools; avoid duplicates; prepare context-install. DO NOT USE FOR: stack detection, .mcp.json writes, auth, or healthchecks. REQUIRES: detected_stack or fallback scan. INVOKES: ask_user, file reads, catalog search.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

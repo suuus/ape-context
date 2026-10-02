@@ -1,0 +1,22 @@
+id: structure-candidate
+name: Draft governed deployment Structure
+description: Converts confirmed topology and guardrails into an inactive ASRP draft.
+tags: [structure, asrp, gates]
+inputs:
+  prompt: |
+    Dry run only; do not call tools or write files. structure_candidates contains:
+    Platform Engineering owns production deployment; the deployment agent invokes
+    a production-deployment entry point; security review is blocking; cost review
+    is advisory; the deployment trace and approvals are required Evidence.
+    Explain the context-structure flow, canonical ASRP content, ADRP Intent
+    binding, exact CLI validation and fingerprint commands, state persisted, and
+    why the draft is not effective or permission to execute.
+expected:
+  output_contains:
+    - "ape-structure-record/v1"
+    - "asrp validate"
+    - "asrp fingerprint"
+    - "asrp bind-intent"
+    - "structure_drafts"
+  outcomes:
+    - type: task_completed

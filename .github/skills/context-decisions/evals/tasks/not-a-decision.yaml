@@ -1,0 +1,12 @@
+id: not-a-decision
+name: Keep ordinary constraint as context
+description: Prevents every sourced fact or constraint from becoming a decision record.
+tags:
+  - decisions
+  - classification
+inputs:
+  prompt: |
+    Dry run only; do not call tools or write files. The only candidate says "production data is stored in West Europe" and provides no choice, alternatives, rationale, authority act, consequence selection, or trade-off. Explain whether context-decisions should draft a record, what gap or clarification is needed, and what state must not be claimed.
+expected:
+  outcomes:
+    - type: task_completed

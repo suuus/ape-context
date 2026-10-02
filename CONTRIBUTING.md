@@ -1,6 +1,8 @@
 # Contributing to Ape Context
 
-Thanks for your interest in contributing! Ape Context is a pure-markdown Copilot plugin — no runtime code, just agent and skill definitions. This makes contributing accessible to anyone comfortable with markdown and prompt engineering.
+Thanks for your interest in contributing! Ape Context is primarily a Markdown
+Copilot plugin, with a Python standard-library helper for deterministic context
+artifact handling and explicit dependencies on the ADRP, ASRP, and AERP CLIs.
 
 ## How to Contribute
 
@@ -14,7 +16,7 @@ Thanks for your interest in contributing! Ape Context is a pure-markdown Copilot
 1. **Fork** the repository
 2. **Create a branch** from `main` (`git checkout -b feature/my-improvement`)
 3. **Make your changes** — see guidelines below
-4. **Test manually** — run the wizard or invoke the skill you changed to verify it works
+4. **Test** — run helper unit tests plus the relevant Waza skill/wizard evaluations
 5. **Submit a PR** using the pull request template
 
 ### What You Can Contribute
@@ -26,6 +28,8 @@ Thanks for your interest in contributing! Ape Context is a pure-markdown Copilot
 | **Bug fixes in skills** | `.github/skills/*/SKILL.md` | Fix incorrect guidance, broken references, edge cases |
 | **Wizard improvements** | `.github/agents/context-wizard.agent.md` | Phase ordering, state management, UX improvements |
 | **Documentation** | `README.md`, skill files | Clarify instructions, add examples, fix typos |
+| **Artifact safety** | `.github/scripts/context_artifacts.py` | Merge preservation, fingerprints, redaction |
+| **Profile integration** | `context-decisions`, `context-structure`, `context-feedback` | ADRP Intent, ASRP Structure, and AERP Evidence orchestration |
 
 ### Guidelines
 
@@ -35,6 +39,23 @@ Thanks for your interest in contributing! Ape Context is a pure-markdown Copilot
 - **Follow the ISEE framework** — map changes to Intent, Structure, Execution, or Evidence
 - **No credentials in code** — never store secrets directly; only configure where they go
 - **Test your changes** — invoke the skill or run the wizard to verify
+- **Keep artifact operations deterministic** — use `context_artifacts.py` for
+  context merge, fingerprint, and sanitization; use the published ADRP, ASRP,
+  and AERP CLIs for profile operations
+- **Do not fork profile ownership** — no copied ADRP/ASRP/AERP schemas or
+  prompt-only fingerprint, lifecycle, manifest, or Evidence logic
+- **Preserve decision boundaries** — drafts are not policy; ratified versions are
+  immutable and must remain bound to their approved context fingerprint
+- **Preserve imported bytes** — put source URI, ETag, retrieval, and local trust in
+  the sidecar; never rewrite an imported canonical record
+
+### Validation
+
+```bash
+python3 -m unittest discover -s tests -v
+waza --no-update-check check --format json
+waza --no-update-check coverage --format json
+```
 
 ### Skill File Structure
 

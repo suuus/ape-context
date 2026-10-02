@@ -12,6 +12,8 @@ inputs:
     healthcheck_results={}
     tagged_doc_sources=[]
     distilled_intent={"intent":[],"constraints":[],"autonomy":[]}
+    context_quality_review={"artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-followup-context","status":"pass","blocking_findings":[],"warnings":[],"unassessed":[]}
+    context_ratification={"status":"ratified","artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-followup-context","quality_status":"pass","accepted_warnings":[],"standing_gaps":[]}
   files:
     - path: .mcp.json
       content: |
@@ -19,6 +21,14 @@ inputs:
     - path: .github/copilot-instructions.md
       content: |
         # Copilot Instructions
+        ## Enterprise Context
+        No MCP servers configured.
+    - path: .github/context-ratification.md
+      content: |
+        # Context Ratification
+        - Status: ratified
+        - Artifact fingerprint: sha256:fixture-followup-context
+        - CAFE(S) result: pass
 expected:
   output_contains:
     - "declines"

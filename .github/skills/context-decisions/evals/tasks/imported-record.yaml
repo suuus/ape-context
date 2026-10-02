@@ -1,0 +1,13 @@
+id: imported-record
+name: Import eligible external decision
+description: Preserves source bytes and requires local scope and authority acceptance.
+tags:
+  - decisions
+  - imports
+  - provenance
+inputs:
+  prompt: |
+    Dry run only; do not call tools or write files. decision_sources contains a valid ratified ape-decision-record/v1 at sharepoint://architecture/ADR-0042.json. It is effective, unexpired, not review-due, and authoritative. Explain the Accept/Preserve/Ignore gate, explicit local scope and authority confirmation, verbatim immutable snapshot plus .source.json sidecar, imported_decisions state, duplicate detection, and why retrieval metadata must not be injected into the canonical record.
+expected:
+  outcomes:
+    - type: task_completed

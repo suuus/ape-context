@@ -4,7 +4,7 @@ description: >-
   CONFIGURATION SKILL. Configure authentication for installed MCP servers by choosing safe credential storage, adding .mcp.json env references, and testing read-only connectivity. USE FOR: set up MCP credentials; fix broken or expired MCP auth; reconnect after token expiry; add env vars to .mcp.json. DO NOT USE FOR: discovering or installing MCP servers, healthcheck-only requests, or writing or committing secrets. REQUIRES: .mcp.json already contains server entries. INVOKES: ask_user for storage choice, file tools for config edits, and read-only checks for connectivity.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

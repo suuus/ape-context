@@ -1,5 +1,5 @@
 name: context-feedback-eval
-description: Tests context-feedback report generation, consistency validation, optional follow-up and commit boundaries, and credential redaction.
+description: Tests AERP Evidence closure, report generation, consistency validation, optional follow-up and commit boundaries, and credential redaction.
 skill: context-feedback
 version: "0.1"
 config:

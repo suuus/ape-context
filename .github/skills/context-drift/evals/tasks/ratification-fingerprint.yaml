@@ -1,0 +1,18 @@
+id: ratification-fingerprint
+name: Ratification fingerprint drift
+description: Requires drift detection to use the canonical fingerprint helper and stale ratification on mismatch.
+tags: [drift, fingerprint, ratification]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files.
+    Use context-drift. Explain how the current Enterprise Context fingerprint is computed and what happens when it differs from context_ratification.
+expected:
+  output_contains:
+    - "context_artifacts.py"
+    - "fingerprint"
+    - "context_ratification"
+    - "stale"
+    - "context-quality"
+    - "context-ratify"
+  outcomes:
+    - type: task_completed

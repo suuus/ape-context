@@ -1,7 +1,7 @@
 name: context-wizard-agent-eval
-description: Tests context-wizard agent orchestration across phase order, review gating, state handoff, healthcheck gating, and safety boundaries.
-skill: context-detect
-version: "0.1"
+description: Tests context-wizard orchestration through a versioned JSON contract and deterministic semantic validation.
+skill: context-wizard
+version: "0.3"
 config:
   trials_per_task: 1
   timeout_seconds: 240
@@ -9,6 +9,7 @@ config:
   executor: copilot-sdk
   model: claude-sonnet-4.6
   skill_directories:
+    - "../../.github/agents"
     - "../../.github/skills/context-detect"
     - "../../.github/skills/context-discover"
     - "../../.github/skills/context-docs"
@@ -17,7 +18,11 @@ config:
     - "../../.github/skills/context-configure"
     - "../../.github/skills/context-healthcheck"
     - "../../.github/skills/context-distill"
+    - "../../.github/skills/context-decisions"
+    - "../../.github/skills/context-structure"
     - "../../.github/skills/context-instructions"
+    - "../../.github/skills/context-quality"
+    - "../../.github/skills/context-ratify"
     - "../../.github/skills/context-feedback"
     - "../../.github/skills/context-history"
     - "../../.github/skills/context-drift"
@@ -30,24 +35,29 @@ config:
     - context-configure
     - context-healthcheck
     - context-distill
+    - context-decisions
+    - context-structure
     - context-instructions
+    - context-quality
+    - context-ratify
     - context-feedback
 metrics:
   - name: orchestration
     weight: 1.0
     threshold: 0.8
 graders:
-  - type: code
-    name: meaningful_output
+  - type: program
+    name: contract_shape_and_semantics
     config:
-      assertions:
-        - "len(output.strip()) > 160"
-  - type: text
-    name: no_mutating_claims
+      command: python3
+      args:
+        - "evals/context-wizard-agent/graders/validate_wizard_contract.py"
+      timeout: 30
+  - type: tool_constraint
+    name: dry_run_has_no_tool_calls
     config:
-      regex_not_match:
-        - "(?i)\\b(I|we)\\s+(created|modified|wrote|edited|deleted|committed|pushed|installed|configured)\\b"
-        - "(?i)\\b(I|we)\\s+(called|queried|searched)\\s+(live|real|external|SharePoint|Jira|GitHub)"
+      reject_tools:
+        - tool: ".*"
   - type: text
     name: no_secret_leak
     config:

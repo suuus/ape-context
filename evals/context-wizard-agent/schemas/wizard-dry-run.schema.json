@@ -1,0 +1,220 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Context Wizard Dry Run Contract",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_version",
+    "scenario",
+    "dry_run",
+    "phase_order",
+    "state_handoffs",
+    "gates",
+    "service_health",
+    "artifact_actions",
+    "approvals",
+    "side_effects"
+  ],
+  "properties": {
+    "contract_version": {
+      "const": "wizard-dry-run/v1"
+    },
+    "scenario": {
+      "enum": [
+        "phase-order",
+        "review-gate",
+        "healthcheck-gate",
+        "state-handoff",
+        "compliance-regulatory-flow",
+        "quality-ratification-gates",
+        "decision-lifecycle",
+        "final-safety"
+      ]
+    },
+    "dry_run": {
+      "const": true
+    },
+    "phase_order": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^context-[a-z-]+$"
+      },
+      "uniqueItems": true
+    },
+    "state_handoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["key", "writer", "readers"],
+        "properties": {
+          "key": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_]*$"
+          },
+          "writer": {
+            "type": "string",
+            "pattern": "^context-[a-z-]+$"
+          },
+          "readers": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^context-[a-z-]+$"
+            },
+            "minItems": 1,
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "gates": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["gate", "status", "blocks", "recovery"],
+        "properties": {
+          "gate": {
+            "type": "string",
+            "pattern": "^context-[a-z-]+$"
+          },
+          "status": {
+            "enum": [
+              "approved",
+              "revise",
+              "ready",
+              "blocked",
+              "pass",
+              "pass_with_warnings",
+              "fail",
+              "incomplete",
+              "current"
+            ]
+          },
+          "blocks": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^context-[a-z-]+$"
+            },
+            "uniqueItems": true
+          },
+          "recovery": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "pattern": "^context-[a-z-]+$"
+            },
+            "uniqueItems": true
+          }
+        }
+      }
+    },
+    "service_health": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": ["server", "status", "required_for_distill", "classification"],
+        "properties": {
+          "server": {
+            "type": "string",
+            "minLength": 1
+          },
+          "status": {
+            "enum": ["connected", "auth_failed", "timeout", "unavailable"]
+          },
+          "required_for_distill": {
+            "type": "boolean"
+          },
+          "classification": {
+            "enum": ["ready", "blocking", "non_blocking"]
+          }
+        }
+      }
+    },
+    "artifact_actions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "artifact",
+          "action",
+          "allowed",
+          "requires_approval",
+          "sanitized"
+        ],
+        "properties": {
+          "artifact": {
+            "type": "string",
+            "minLength": 1
+          },
+          "action": {
+            "enum": [
+              "create",
+              "update",
+              "sanitize",
+              "commit",
+              "push",
+              "none"
+            ]
+          },
+          "allowed": {
+            "type": "boolean"
+          },
+          "requires_approval": {
+            "type": "boolean"
+          },
+          "sanitized": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "approvals": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "granted"],
+      "properties": {
+        "required": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        },
+        "granted": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    },
+    "side_effects": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["performed", "planned"],
+      "properties": {
+        "performed": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "planned": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "uniqueItems": true
+        }
+      }
+    }
+  }
+}

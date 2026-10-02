@@ -1,26 +1,43 @@
 ---
 name: context-distill
 description: >-
-  DISTILL SKILL. Build distilled_intent from docs/history incl. regulatory constraints. USE FOR: context-wizard distillation, manual/drift re-distill. DO NOT USE FOR: discovery, live history queries, policy invention, code/infra edits. REQUIRES: tagged_doc_sources/history_observations; else ask. INVOKES: ask_user, doc reads, session_state, changelog.
+  INTENT DISTILLATION. USE FOR: Phase 8, re-distill sourced Intent, identify
+  ADRP decisions, identify ASRP Structure candidates. DO NOT USE FOR: source
+  discovery, invented policy, profile drafting, ratification, or code edits.
+  INVOKES: reads, ask_user, adrp CLI, changelog, session_state.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 
-## Contracts
-Inputs: `tagged_doc_sources`=`[{category,platform,location,tag,url?,notes?}]`; `history_observations`=`{intent[],constraints[],topology[],gaps[],sources[]}`.
-Output: `distilled_intent`=`{intent[],constraints[],autonomy[],topology[],history_observations?}`.
+Load `tagged_doc_sources` and optional `history_observations`. Persist:
+
+- `distilled_intent`: `{intent[],constraints[],autonomy[],topology[],gaps[]}`;
+- `decision_candidates`: explicit/strongly evidenced choices;
+- `decision_sources`: detected ADRP records;
+- `structure_candidates`: sourced ownership, components, responsibilities,
+  interfaces, boundaries, gates, entry points, artifacts, and Evidence duties.
+
+Always name those keys literally, including in dry runs.
 
 ## Procedure
-1. For dry-run prompts: use fixtures; skip live M365/Jira/history and edits.
-2. Load inputs. If none exist, only ask for priorities/rules/autonomy; return no inferred facts or example policies. If one source is missing, proceed and note it.
-3. Read supplied intent/constraint/process docs incl. regulatory/audit via files, `workiq`, or Jira; skip inaccessible sources.
-4. Extract sourced/user-confirmed intent, obligations, evidence needs, autonomy limits, and gaps only; do not invent.
-5. Autonomy uses `level/action/reason/source`: `PROCEED`=no ask; `ALWAYS ASK`=confirm; `NEVER`=forbidden. Defaults: read-only `PROCEED`; destructive `ALWAYS ASK`; out-of-domain `NEVER`/`ALWAYS ASK`.
-6. Ask user to confirm/edit; no interaction sets `needs_confirmation`.
-7. Diff previous/new as `added`, `modified`, `removed`, `unchanged`; trigger `initial setup`, `manual re-distill`, or `drift-triggered`. Append changelog only for changes.
-8. Persist to `session_state`; report write failures. Mark `ctx-distill` done only when `context-wizard` invoked and todo exists.
 
-## Side effects
-External docs/history reads are read-only. Local writes: `.github/intent-changelog.md`, `session_state`; never claim fully read-only.
+1. Use fixtures only in dry-run. Ask about missing priorities, rules, or gaps.
+2. Read accessible sources. Source location proves provenance, not authority.
+3. For `ape-decision-record/v1`, run `adrp --version`,
+   `adrp validate --target`, and `adrp assess --target`. Preserve identity,
+   fingerprint, lifecycle, scope, authority, and gaps; never redraft it.
+4. Extract only sourced/user-confirmed Intent, obligations, autonomy, topology,
+   and candidates. Use authority states `authoritative`, `advisory`,
+   `conflicting`, `unknown`, or `user-confirmed`.
+5. A constraint is not automatically a decision. ASRP candidates are not active
+   Structure until `context-structure` validates them.
+6. Classify autonomy as `PROCEED`, `ALWAYS ASK`, or `NEVER`.
+7. Confirm accuracy; without interaction mark `needs_confirmation`.
+8. Diff as `added`, `modified`, `removed`, and `unchanged`. Real changes append
+   to `.github/intent-changelog.md` with trigger `initial setup`,
+   `manual re-distill`, or `drift-triggered`; dry runs describe the entry only.
+
+Missing/failing ADRP CLI blocks ADRP source processing. Never claim persisted
+state when SQL fails.

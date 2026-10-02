@@ -4,7 +4,7 @@ description: >-
   HISTORY SKILL. Analyze consented Copilot session history into history_observations. USE FOR: recent intent patterns, recurring workflows, repo topology, gaps, and context-distill/context-wizard input. DO NOT USE FOR: live monitoring, audits, or file edits. REQUIRES: explicit consent and session_store_sql. INVOKES: ask_user first; read-only session_store_sql/DuckDB only after consent.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

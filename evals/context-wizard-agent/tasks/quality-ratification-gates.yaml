@@ -1,0 +1,17 @@
+id: quality-ratification-gates
+name: Quality and ratification block feedback
+description: Ensures failed CAFE(S) review cannot be ratified and unratified context cannot proceed to final feedback.
+tags:
+  - orchestration
+  - cafes
+  - ratification
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call tools, edit files, or persist state.
+    Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    gates entries use only {gate,status,blocks,recovery}. Never invent alternate keys.
+    Set scenario to "quality-ratification-gates". Populate only gates and approvals. Gate context-quality has status fail, blocks context-ratify and context-feedback, and recovers through context-distill, context-decisions, context-structure, and context-instructions. Gate context-ratify has status blocked and blocks context-feedback. approvals.required contains exactly human-ratification and approvals.granted is empty. Leave every other array empty.
+expected:
+  outcomes:
+    - type: task_completed

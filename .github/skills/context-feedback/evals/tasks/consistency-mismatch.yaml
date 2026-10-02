@@ -11,16 +11,8 @@ inputs:
     healthcheck_results={"github-mcp-server":{"status":"connected","detail":"ok"}}
     tagged_doc_sources=[]
     distilled_intent={"intent":[],"constraints":[],"autonomy":[]}
-  files:
-    - path: .mcp.json
-      content: |
-        {"mcpServers":{"github-mcp-server":{"tools":["*"]},"atlassian-jira":{"tools":["get_issue"]}}}
-    - path: .github/copilot-instructions.md
-      content: |
-        # Copilot Instructions
-        ## Enterprise Context
-        github-mcp-server is documented.
-        microsoft-365 is documented.
+    The supplied .mcp.json contains github-mcp-server and atlassian-jira.
+    The supplied instructions name github-mcp-server and microsoft-365.
 expected:
   output_contains:
     - "atlassian-jira"

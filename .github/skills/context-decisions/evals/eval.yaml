@@ -1,0 +1,36 @@
+name: context-decisions-eval
+description: Tests decision candidate classification, validated canonical drafts, and draft-versus-ratified boundaries.
+skill: context-decisions
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-decisions
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 140"
+  - type: text
+    name: preserves_draft_boundary
+    config:
+      regex_not_match:
+        - "(?i)\\b(already ratified|automatically approved)\\b"
+  - type: text
+    name: dry_run_safe
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|we)\\s+(wrote|created|ratified|committed)\\s+(the\\s+)?(real\\s+)?"
+tasks:
+  - "tasks/*.yaml"

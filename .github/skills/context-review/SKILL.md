@@ -4,7 +4,7 @@ description: >-
   REVIEW GATE SKILL. Present the proposed context-wizard setup plan for explicit user approval before installation or file changes. USE FOR: review MCP recommendations; confirm scoping and generated files; approve, revise, or stop setup. DO NOT USE FOR: discovering servers, editing .mcp.json, configuring auth, or generating instructions. REQUIRES: discovered_servers or a plan summary. INVOKES: ask_user only.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

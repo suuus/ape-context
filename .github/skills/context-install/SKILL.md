@@ -4,7 +4,7 @@ description: >-
   MCP INSTALL CONFIG SKILL. Write approved MCP server entries to .mcp.json from discovered_servers and scoping_decisions while preserving existing config. USE FOR: install approved MCP config; apply read-only/read-write tool scopes; merge server entries. DO NOT USE FOR: discovering servers, auth setup, healthchecks, npm install, or blocked/unresolved servers. REQUIRES: approved discovered_servers. INVOKES: file read/write and SQL session_state reads.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

@@ -1,0 +1,36 @@
+name: context-structure-eval
+description: Tests ASRP Structure candidate handling, Intent binding, validation, and inactive-draft boundaries.
+skill: context-structure
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-structure
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 150"
+  - type: text
+    name: uses_asrp_boundary
+    config:
+      regex_match:
+        - "(?i)asrp (validate|fingerprint|bind-intent|compile)"
+  - type: text
+    name: preserves_draft_boundary
+    config:
+      regex_not_match:
+        - "(?i)\\b(automatically effective|already active)\\b"
+tasks:
+  - "tasks/*.yaml"

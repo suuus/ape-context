@@ -11,7 +11,11 @@ inputs:
     healthcheck_results={"github-mcp-server":{"status":"connected","detail":"listed repositories"},"workiq":{"status":"connected","detail":"answered docs query"}}
     tagged_doc_sources=[{"category":"Engineering docs","platform":"SharePoint","location":"engineering","tag":"reference"},{"category":"Security","platform":"Backstage","location":"catalog","tag":"constraint"}]
     distilled_intent={"intent":["Prioritize reliability"],"constraints":["No secrets in repo"],"autonomy":[{"action":"Read docs","level":"PROCEED","reason":"read-only","source":"docs"}]}
-    Draft the final report summary and validation result. In your response, explicitly list the literal server names, doc category, intent statement, Healthcheck section, and context-report.md path from the fixtures.
+    context_quality_review={"artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-report-context","status":"pass","dimensions":{"clarity":{"status":"pass","findings":[]},"actionability":{"status":"pass","findings":[]},"fidelity":{"status":"pass","findings":[]},"efficiency":{"status":"pass","findings":[]},"security":{"status":"pass","findings":[]}},"blocking_findings":[],"warnings":[],"unassessed":[]}
+    context_ratification={"status":"ratified","artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-report-context","quality_status":"pass","accepted_warnings":[],"standing_gaps":[]}
+    Draft the final report summary and validation result. Explicitly list the
+    literal server names, doc category, intent statement, Healthcheck section,
+    exact heading `CAFE(S)`, and context-report.md path from the fixtures.
   files:
     - path: .mcp.json
       content: |
@@ -29,6 +33,13 @@ inputs:
     - path: .github/intent-changelog.md
       content: |
         # Intent Changelog
+    - path: .github/context-ratification.md
+      content: |
+        # Context Ratification
+        - Status: ratified
+        - Artifact: .github/copilot-instructions.md#enterprise-context
+        - Artifact fingerprint: sha256:fixture-report-context
+        - CAFE(S) result: pass
 expected:
   output_contains:
     - "github-mcp-server"
@@ -36,6 +47,8 @@ expected:
     - "Engineering docs"
     - "Prioritize reliability"
     - "Healthcheck"
+    - "CAFE(S)"
+    - "ratified"
     - "context-report.md"
   outcomes:
     - type: task_completed

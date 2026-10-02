@@ -4,7 +4,7 @@ description: >-
   MCP HEALTHCHECK SKILL. Test configured MCP servers with lightweight read-only operations and persist healthcheck_results for downstream phases. USE FOR: verify MCP connectivity; classify auth failures, timeouts, startup errors, and skipped servers; gate distillation. DO NOT USE FOR: auth setup, server discovery, .mcp.json edits, or external writes. REQUIRES: .mcp.json with servers. INVOKES: read-only MCP tools and SQL persistence.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 

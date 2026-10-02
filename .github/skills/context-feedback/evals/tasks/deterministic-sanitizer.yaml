@@ -1,0 +1,20 @@
+id: deterministic-sanitizer
+name: Deterministic report sanitizer
+description: Requires report content to be sanitized before reaching the repository path.
+tags: [security, redaction, helper]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not write files or print secret values.
+    Use context-feedback and explain the exact helper command that turns a temporary report draft into .github/context-report.md. State what happens on helper failure and confirm that the unsanitized target is never written.
+expected:
+  output_contains:
+    - "context_artifacts.py"
+    - "sanitize"
+    - "--input"
+    - "--output"
+    - ".github/context-report.md"
+    - "--mcp-config"
+    - "failure"
+    - "never"
+  outcomes:
+    - type: task_completed

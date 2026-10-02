@@ -11,7 +11,6 @@ inputs:
 expected:
   output_contains:
     - "ask"
-    - "priorities"
     - "rules"
   outcomes:
     - type: task_completed

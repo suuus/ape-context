@@ -1,26 +1,39 @@
 ---
 name: context-drift
 description: >-
-  DRIFT SKILL. Rescan workspace read-only for context drift. Compare stack, .mcp.json, Copilot instructions, MCP health/auth, and dependency notes. USE FOR: new/removed tools, stale instructions, auth failures, and intent-affecting cloud, security, deploy, monitoring, or access-control changes. DO NOT USE FOR: initial setup, install/configure, file edits, or live fixes. REQUIRES: workspace access; .mcp.json/instructions optional. INVOKES: file reads, optional read-only health checks, ask_user for fixes/re-distill.
+  READ-ONLY DRIFT CHECK. USE FOR: stale tools, changed policy, mismatched ADRP or
+  ASRP bindings, missing AERP Evidence, changed artifact bytes. DO NOT USE FOR:
+  setup, fixes, execution, or re-ratification. INVOKES: reads, health checks,
+  profile CLIs, ask_user.
 license: MIT
 metadata:
-  version: 0.0.1
+  version: 0.1.0
   user-invocable: true
 ---
 
-## Steps
-1. Use persisted `detected_stack` if available; otherwise scan manifests, workflows, infra files, `.mcp.json`, and instructions. Missing/unreadable config is drift, not failure.
-2. Compare detected tools to MCP servers: flag new uncovered tools, removed tools still configured, stale instruction references, and configured servers absent from instructions.
-3. Check MCP health/auth with read-only calls unless the prompt says dry-run/fixture-only or supplies health facts; then cite fixtures and make no live calls.
-4. Note visible dependency/package updates; skip unavailable lookups as `info`.
-5. Mark cloud, security, deploy pipeline, monitoring/observability, or access-control changes as intent-affecting.
+1. Load stack, MCP, instructions, ADRP decisions/imports, ASRP Structure,
+   execution manifest, ratification, and AERP Evidence. Missing required state is
+   drift.
+2. Flag uncovered/removed tools, stale references, health/auth failures, and
+   instruction bloat above 80 lines or 25% growth.
+3. Run `context_artifacts.py fingerprint`; mismatch or material source,
+   authority, autonomy, trust, or scope change invalidates ratification.
+4. Use ADRP to validate decisions, imports, sidecars, lifecycle, source drift,
+   supersession, contradiction, and tampering. Never overwrite imports.
+5. Use ASRP to validate Structure and manifest fingerprints. Changed ownership,
+   responsibility, interfaces, boundaries, gates, entry points, or Evidence
+   duties is action-required.
+6. Use AERP to validate required Evidence, exact ADRP/ASRP bindings, and artifact
+   bytes. Missing Evidence, mismatch, or unverifiable artifacts is
+   action-required.
 
-## Output
+Return exactly:
+
 ```json
 {"drift_report":{"action_required":[],"warnings":[],"info":[],"intent_affecting":[]}}
 ```
 
-Items include `title`, `source`, `evidence`, `severity`, `proposed_fix`. Severities: `info`, `warning`, `action_required`; intent-affecting items are `action_required` and listed in `intent_affecting`. Clean run: all arrays empty.
-
-## Safety
-Never edit, install, remove, or configure. For any non-empty report, include `ask_user` fixes in severity order: discover/install, remove stale config, rerun configure, or regenerate instructions. If `intent_affecting` is non-empty, ask about `context-distill`.
+Items contain title, source, evidence, severity, and fix. Material changes are
+both `action_required` and `intent_affecting`. Clean means all arrays are empty.
+Use `ask_user` before any fix. Never edit or claim re-ratification. Route fixes through `context-distill` → Decisions →
+Structure → Instructions → Quality → Ratify → Evidence/Feedback.

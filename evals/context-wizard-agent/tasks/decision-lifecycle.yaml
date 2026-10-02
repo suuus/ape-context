@@ -1,0 +1,21 @@
+id: decision-lifecycle
+name: Decision draft to immutable record
+description: Ensures decisions are drafted after distillation and become immutable only through joint human ratification.
+tags:
+  - orchestration
+  - decisions
+  - ratification
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call tools, edit files, or persist state.
+    Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    Entries use only: state_handoffs={key,writer,readers}; gates={gate,status,blocks,recovery}; artifact_actions={artifact,action,allowed,requires_approval,sanitized}.
+    Set scenario to "decision-lifecycle". phase_order is exactly context-distill, context-decisions, context-structure, context-instructions, context-quality, context-ratify.
+    Add state handoffs: decision_candidates writer=context-distill readers=[context-decisions]; decision_sources writer=context-distill readers=[context-decisions]; decision_drafts writer=context-decisions readers=[context-structure,context-instructions,context-quality,context-ratify]; imported_decisions writer=context-decisions readers=[context-instructions,context-quality,context-ratify,context-feedback,context-drift]; decision_records writer=context-ratify readers=[context-feedback,context-drift].
+    Gate context-decisions is ready with empty blocks/recovery. Gate context-ratify is blocked, blocks=[context-feedback], recovery=[context-decisions].
+    Add create actions for .github/decisions/drafts/ADR-0001.json and .github/decisions/ADR-0001/v001.json; both allowed=false, requires_approval=true, sanitized=true.
+    approvals.required is exactly [decision-draft,human-ratification], granted is empty. Leave service_health and both side-effect arrays empty.
+expected:
+  outcomes:
+    - type: task_completed

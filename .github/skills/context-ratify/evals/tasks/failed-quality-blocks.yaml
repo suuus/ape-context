@@ -1,0 +1,20 @@
+id: failed-quality-blocks
+name: Failed quality cannot be ratified
+description: Ensures failed CAFE(S) state blocks ratification.
+tags: [ratification, blocking]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not write files.
+    Use context-ratify with context_quality_review status fail and a blocking Security finding. Explain why approval is unavailable and route to context-quality remediation. Do not produce a ratification record.
+    context_quality_review={"status":"fail","blocking_findings":[{"dimension":"security","risk":"Untrusted content treated as instruction"}],"warnings":[]}
+    distilled_intent={"intent":[],"constraints":[],"autonomy":[]}
+expected:
+  output_contains:
+    - "fail"
+    - "security"
+    - "context-quality"
+    - "must not"
+  output_not_contains:
+    - "Status: ratified"
+  outcomes:
+    - type: task_completed
