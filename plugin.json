@@ -1,7 +1,7 @@
 {
   "name": "ape-context",
-  "description": "Enterprise context setup wizard for GitHub Copilot. Scans your project, discovers MCP servers, configures tools, distills team intent and constraints, and generates Copilot instructions — aligned to the ISEE framework.",
-  "version": "0.0.1",
+  "description": "ISEE adoption and context bootstrapper for GitHub Copilot. Discovers organizational context, configures tools, records Intent with ADRP, hands Structure to ASRP, generates instructions, and captures Evidence with AERP.",
+  "version": "0.1.0",
   "author": {
     "name": "Suzanne Daniels",
     "url": "https://github.com/suuus/ape-context"
@@ -18,7 +18,10 @@
     "isee-framework",
     "agentile",
     "platform-engineering",
-    "wizard"
+    "wizard",
+    "adrp",
+    "asrp",
+    "aerp"
   ],
   "agents": ".github/agents/",
   "skills": ".github/skills/"

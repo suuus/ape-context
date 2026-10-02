@@ -1,0 +1,25 @@
+id: stale-instructions
+name: Stale instructions reference missing server
+description: Ensures instructions referencing absent servers are reported without crashing.
+tags:
+  - instructions
+  - stale
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. copilot-instructions.md references datadog-mcp-server, but .mcp.json has only github-mcp-server.
+    Report the drift_report and safe follow-up.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use github-mcp-server for GitHub. Use datadog-mcp-server for observability.
+expected:
+  output_contains:
+    - "datadog-mcp-server"
+    - "warnings"
+    - "instructions"
+  outcomes:
+    - type: task_completed

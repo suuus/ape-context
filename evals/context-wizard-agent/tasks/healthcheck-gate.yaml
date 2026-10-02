@@ -1,0 +1,16 @@
+id: healthcheck-gate
+name: Healthcheck gating semantics
+description: Ensures only doc-source-required servers block distillation and auth failures route to configure.
+tags:
+  - orchestration
+  - healthcheck
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call tools or ask a live user.
+    Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    If populated, entries use only these keys: state_handoffs={key,writer,readers}; gates={gate,status,blocks,recovery}; service_health={server,status,required_for_distill,classification}; artifact_actions={artifact,action,allowed,requires_approval,sanitized}. Never invent alternate keys.
+    Set scenario to "healthcheck-gate". tagged_doc_sources requires SharePoint through workiq. Populate only gates and service_health. workiq is auth_failed, required, and blocking; github-mcp-server is connected, optional, and ready; atlassian-jira is timeout, optional, and non_blocking. Gate context-healthcheck has status="blocked", blocks=["context-distill"], recovery=["context-configure"]. Leave all other arrays empty.
+expected:
+  outcomes:
+    - type: task_completed

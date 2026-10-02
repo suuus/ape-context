@@ -12,7 +12,9 @@ You should receive a response within 48 hours. We will work with you to understa
 
 ## What Counts as a Security Issue
 
-Ape Context is a pure-markdown Copilot plugin with no runtime code. Security concerns include:
+Ape Context is a Copilot plugin with Markdown agents/skills, one Python
+standard-library context-artifact helper, and explicit ADRP, ASRP, and AERP CLI
+dependencies for profile operations. Security concerns include:
 
 - **Credential exposure** — any path where the wizard could log, commit, or expose credentials
 - **Prompt injection** — skill instructions that could be manipulated to bypass guardrails
@@ -29,9 +31,24 @@ This project enforces the following security invariants:
 - **Session history analysis requires explicit consent** before any queries run
 - All tool selections go through **user confirmation** before installation
 - MCP server scoping (read-only vs read+write) is surfaced as an explicit decision
+- Generated reports pass through deterministic secret sanitization before reaching
+  `.github/context-report.md`
+- Enterprise Context changes use an atomic merge helper that refuses unapproved
+  replacement of manual sections
+- ADRP and ASRP records are validated by their published CLIs; immutable
+  versions cannot overwrite an existing record or rendering
+- Imported decisions preserve exact source bytes and keep retrieval/trust metadata
+  in a separate validated sidecar
+- External approval never grants local standing automatically; active use requires
+  lifecycle eligibility plus explicit local scope and authority acceptance
+- Ratification binds canonical ADRP and ASRP fingerprints to the exact generated
+  context fingerprint; AERP binds resulting Evidence back to those exact records
+- Source provenance, source authority, approver identity, and organisational
+  standing remain separate claims
 
 ## Supported Versions
 
 | Version | Supported |
 |---------|-----------|
-| 0.0.x   | ✅        |
+| 0.1.x   | ✅        |
+| 0.0.x   | Security fixes only |

@@ -1,0 +1,26 @@
+id: wizard-gate
+name: Wizard blocking semantics
+description: Ensures only doc-source-required servers block distillation.
+tags:
+  - healthcheck
+  - wizard
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not call real MCP tools, ask_user, or edit files; answer in prose only.
+    Use context-healthcheck in wizard mode with tagged_doc_sources requiring workiq for SharePoint docs.
+    Simulated healthcheck_results:
+    workiq={status:"auth_failed",detail:"403"}
+    github-mcp-server={status:"connected",detail:"listed repos"}
+    atlassian-jira={status:"timeout",detail:"10s timeout"}
+    Explain which failures block context-distill and which are non-blocking.
+expected:
+  output_contains:
+    - "workiq"
+    - "blocking"
+    - "context-distill"
+    - "github-mcp-server"
+    - "connected"
+    - "atlassian-jira"
+    - "non-blocking"
+  outcomes:
+    - type: task_completed

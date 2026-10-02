@@ -1,0 +1,32 @@
+name: context-docs-eval
+description: Tests documentation source tagging, skip handling, Other values, and tagged_doc_sources persistence contract.
+skill: context-docs
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-docs
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: no_content_fetch_or_write
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|we)\\s+(fetched|read|searched|opened)\\s+(SharePoint|Confluence|Notion|Backstage|live|real)"
+        - "(?i)\\b(I|we)\\s+(created|modified|wrote|edited|deleted)\\b"
+tasks:
+  - "tasks/*.yaml"

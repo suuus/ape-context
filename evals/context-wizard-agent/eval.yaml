@@ -1,0 +1,68 @@
+name: context-wizard-agent-eval
+description: Tests context-wizard orchestration through a versioned JSON contract and deterministic semantic validation.
+skill: context-wizard
+version: "0.3"
+config:
+  trials_per_task: 1
+  timeout_seconds: 240
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - "../../.github/agents"
+    - "../../.github/skills/context-detect"
+    - "../../.github/skills/context-discover"
+    - "../../.github/skills/context-docs"
+    - "../../.github/skills/context-review"
+    - "../../.github/skills/context-install"
+    - "../../.github/skills/context-configure"
+    - "../../.github/skills/context-healthcheck"
+    - "../../.github/skills/context-distill"
+    - "../../.github/skills/context-decisions"
+    - "../../.github/skills/context-structure"
+    - "../../.github/skills/context-instructions"
+    - "../../.github/skills/context-quality"
+    - "../../.github/skills/context-ratify"
+    - "../../.github/skills/context-feedback"
+    - "../../.github/skills/context-history"
+    - "../../.github/skills/context-drift"
+  required_skills:
+    - context-detect
+    - context-discover
+    - context-docs
+    - context-review
+    - context-install
+    - context-configure
+    - context-healthcheck
+    - context-distill
+    - context-decisions
+    - context-structure
+    - context-instructions
+    - context-quality
+    - context-ratify
+    - context-feedback
+metrics:
+  - name: orchestration
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: program
+    name: contract_shape_and_semantics
+    config:
+      command: python3
+      args:
+        - "evals/context-wizard-agent/graders/validate_wizard_contract.py"
+      timeout: 30
+  - type: tool_constraint
+    name: dry_run_has_no_tool_calls
+    config:
+      reject_tools:
+        - tool: ".*"
+  - type: text
+    name: no_secret_leak
+    config:
+      regex_not_match:
+        - "ghp_[A-Za-z0-9_]{20,}"
+        - "JIRA_TOKEN=super-secret-token-1234567890"
+tasks:
+  - "tasks/*.yaml"

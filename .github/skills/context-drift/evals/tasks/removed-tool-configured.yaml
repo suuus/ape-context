@@ -1,0 +1,27 @@
+id: removed-tool-configured
+name: Removed tool still configured
+description: Ensures configured servers with no matching tool signals are action-required drift.
+tags:
+  - stale-config
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. .mcp.json still configures datadog-mcp-server, but the fixture workspace has no Datadog references.
+    Report the drift_report and include the literal ask_user follow-up you would invoke.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"datadog-mcp-server":{"type":"local","tools":["*"]},"github-mcp-server":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use github-mcp-server for GitHub operations.
+    - path: package.json
+      content: |
+        {"scripts":{"test":"vitest"}}
+expected:
+  output_contains:
+    - "datadog-mcp-server"
+    - "action_required"
+    - "ask_user"
+  outcomes:
+    - type: task_completed

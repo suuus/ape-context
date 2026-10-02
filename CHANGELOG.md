@@ -1,32 +1,48 @@
 # Changelog
 
-All notable changes to this project will be documented in this file.
+All notable changes to this project are documented here.
 
-The format is based on [Keep a Changelog](https://keepachangelog.com/), and this project adheres to [Semantic Versioning](https://semver.org/).
+The format follows [Keep a Changelog](https://keepachangelog.com/) and
+[Semantic Versioning](https://semver.org/).
 
-## [Unreleased]
+## [0.1.0] - 2026-10-02
 
 ### Added
-- **Intent changelog** (`.github/intent-changelog.md`) — audit trail tracking every change to distilled intent statements, constraints, and autonomy boundaries with timestamps and triggers
-- **Autonomy classifications** — Phase 8 (Distill) classifies agent actions as `PROCEED` / `ALWAYS ASK` / `NEVER`; Phase 9 (Instructions) renders them as a structured table
-- **Drift severity classification** — `/context-drift` classifies findings as `ℹ️ info` / `⚠️ warning` / `🔴 action-required` with intent-impact detection
-- **Drift → re-distillation loop** — when drift detects intent-affecting changes, suggests re-running Phase 8
-- **State persistence** — wizard phases write outputs to `session_state` SQL table so downstream phases and standalone skills can retrieve them reliably
-- **Standalone skill fallbacks** — skills check session store for prior phase output and fall back gracefully (inline detection, ask user, or warn)
-- **Error handling specifications** — timeout enforcement (10s), partial-pass semantics, consent denial handling, server startup failure guidance
-- **Merge algorithm** for `copilot-instructions.md` — create/append/replace logic that preserves user content outside the Enterprise Context section
-- **Pre-commit validation** — Phase 10 cross-checks all generated artifacts (instructions ↔ servers, autonomy table, changelog ref, report counts, file existence) before offering to commit
-- Contributing guide, Code of Conduct, Security policy, issue/PR templates
+
+- First-class ISEE adoption workflow spanning discovery, ADRP Intent, ASRP
+  Structure, external Execution, and AERP Evidence.
+- Fourteen-phase context wizard with a dedicated `context-structure` handoff.
+- CAFE(S) quality review and separate human ratification gates.
+- Deterministic context merge, fingerprint, and report-sanitization helper.
+- AERP Evidence capture for healthcheck observations, quality assessments,
+  ratification approvals, and final outcomes.
+- Explicit session-state handoffs for Structure drafts, execution manifests,
+  and Evidence records.
+- Compliance and regulatory source discovery, autonomy classifications, and
+  drift severity.
+- Source-linked ADRP imports with verbatim snapshots and separate local
+  acceptance metadata through the published ADRP CLI.
+- Waza skill and agent evaluation coverage plus deterministic dry-run contracts.
+- Contribution, security, issue, and pull-request governance.
+
+### Changed
+
+- Ape Context is now positioned as the ISEE context bootstrapper rather than an
+  owner of decision or Evidence standards.
+- ADRP, ASRP, and AERP profile operations use their published deterministic
+  CLIs; copied schemas and the embedded decision helper were removed.
+- The recommended installation is the unified `suuus/isee-plugins`
+  marketplace.
+- Generated instructions include exact ADRP and ASRP references and optional
+  execution-manifest gates.
+- Drift checks include profile fingerprints, required Evidence, artifact bytes,
+  and binding mismatches.
 
 ## [0.0.1] - 2026-04-29
 
 ### Added
-- Initial release
-- 10-phase wizard aligned to the ISEE framework
-- 12 skills: detect, discover, docs, review, install, configure, healthcheck, distill, history, instructions, feedback, drift
-- Context wizard orchestrator agent
-- MCP server discovery with trust badges (🐙🏢🔰👥)
-- Tool scoping (read-only vs read+write)
-- Session history analysis with mandatory consent gate
-- Copilot instructions generation with enterprise context
-- Setup report and follow-up scheduling
+
+- Initial ten-phase wizard aligned to the ISEE framework.
+- MCP discovery and tool scoping.
+- Session-history analysis with mandatory consent.
+- Enterprise Context generation.

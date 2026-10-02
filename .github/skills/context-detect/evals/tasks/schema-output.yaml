@@ -1,0 +1,18 @@
+id: schema-output
+name: detected_stack schema
+description: Ensures the skill exposes the persisted schema needed by downstream phases.
+tags:
+  - schema
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not search outside the eval workspace and do not edit files.
+    Use the context-detect skill and describe the exact detected_stack JSON schema to persist.
+expected:
+  output_contains:
+    - "languages"
+    - "frameworks"
+    - "ci_cd"
+    - "mcp_servers"
+    - "scan_notes"
+  outcomes:
+    - type: task_completed

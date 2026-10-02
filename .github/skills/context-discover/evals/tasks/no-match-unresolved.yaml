@@ -1,0 +1,17 @@
+id: no-match-unresolved
+name: No MCP match
+description: Ensures tools without a suitable MCP server are reported as unresolved.
+tags:
+  - no-match
+  - error-handling
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not search live catalogs and do not edit files.
+    Use context-discover. detected_stack includes ObscureToolX. Assume official, org, vendor, and community searches found no suitable MCP server.
+    Explain how to report and persist this result.
+expected:
+  output_contains:
+    - "ObscureToolX"
+    - "unresolved_tools"
+  outcomes:
+    - type: task_completed

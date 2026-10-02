@@ -1,0 +1,26 @@
+id: manual-edit-warning
+name: Manual edit warning path
+description: Warns and asks before replacing a manually edited Enterprise Context.
+tags: [safety, merge]
+inputs:
+  prompt: |
+    This is a dry-run evaluation: answer in prose only, use only fixtures, do not call tools, do not edit files, and do not ask a live user.
+    Use context-instructions. Existing Enterprise Context lacks the generated marker and contains custom prose.
+    Describe the warning/confirmation path before any replacement, including the ask_user prompt you would use with the exact text `Proceed?`.
+  files:
+    - path: .github/copilot-instructions.md
+      content: |
+        # Copilot Instructions
+
+        ## Enterprise Context
+        Custom hand-written routing notes for a private tool.
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"command":"docker","args":["github/server"]}}}
+expected:
+  output_contains:
+    - "manual edits"
+    - "ask_user"
+    - "Proceed?"
+  outcomes:
+    - type: task_completed

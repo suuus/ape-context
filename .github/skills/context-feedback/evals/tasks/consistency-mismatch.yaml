@@ -1,0 +1,24 @@
+id: consistency-mismatch
+name: Detect instructions versus MCP mismatch
+description: Ensures validation flags missing and extra server references before commit.
+tags:
+  - validation
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Use only eval workspace fixtures and do not edit files, create issues, commit, or push.
+    Use context-feedback to validate artifacts. If validation issues exist, list them and state that you must ask whether to fix before any commit.
+    Include the exact phrase "before commit" in the validation warning.
+    healthcheck_results={"github-mcp-server":{"status":"connected","detail":"ok"}}
+    tagged_doc_sources=[]
+    distilled_intent={"intent":[],"constraints":[],"autonomy":[]}
+    The supplied .mcp.json contains github-mcp-server and atlassian-jira.
+    The supplied instructions name github-mcp-server and microsoft-365.
+expected:
+  output_contains:
+    - "atlassian-jira"
+    - "microsoft-365"
+    - "validation"
+    - "ask"
+    - "commit"
+  outcomes:
+    - type: task_completed

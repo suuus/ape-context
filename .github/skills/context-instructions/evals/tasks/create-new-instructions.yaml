@@ -1,0 +1,31 @@
+id: create-new-instructions
+name: Create new instructions file
+description: Generates Enterprise Context from .mcp.json plus distilled_intent when the target file is absent.
+tags: [create, contracts]
+inputs:
+  prompt: |
+    This is a dry-run evaluation: answer in prose only, use only fixtures, do not call tools, and do not create, edit, or delete real repo files.
+    Use context-instructions. The fixture has no `.github/copilot-instructions.md`.
+    Simulated session_state:
+      tagged_doc_sources:
+        - {category: "Engineering docs", platform: "SharePoint", location: "engineering", tag: "process", notes: "Search via workiq"}
+      distilled_intent:
+        intent: ["Reliability over velocity"]
+        constraints: ["All PRs require security review for auth changes"]
+        autonomy: [{action: "Read CI logs", level: "PROCEED", reason: "Read-only"}]
+        topology: ["Platform owns deployments"]
+    Show the Enterprise Context you would create. Include exact server IDs `github-mcp-server` and `workiq`, and include a `Cross-tool` workflows heading.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"command":"docker","args":["github/server"]},"workiq":{"command":"npx","args":["@microsoft/workiq"]}}}
+expected:
+  output_contains:
+    - "Enterprise Context"
+    - "github-mcp-server"
+    - "workiq"
+    - "Reliability over velocity"
+    - "Documentation"
+    - "Cross-tool"
+  outcomes:
+    - type: task_completed

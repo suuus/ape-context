@@ -1,0 +1,31 @@
+name: context-discover-eval
+description: Tests context-discover reuse of existing MCP coverage, write-gap handling, catalog policy, no-match reporting, and persistence contracts.
+skill: context-discover
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-discover
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: read_only
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|I've|we|we've)\\s+(created|modified|deleted|installed|configured)\\b"
+tasks:
+  - "tasks/*.yaml"

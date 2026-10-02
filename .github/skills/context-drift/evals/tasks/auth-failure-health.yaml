@@ -1,0 +1,26 @@
+id: auth-failure-health
+name: Auth failure in health check
+description: Ensures auth failures are action-required drift without pretending connectivity succeeded.
+tags:
+  - auth
+  - health
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. The fixture health result for workiq is 401 unauthorized.
+    Report the drift_report and include the literal ask_user follow-up you would invoke.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"workiq":{"type":"local","tools":["ask_work_iq"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use workiq for Microsoft 365 read/search.
+expected:
+  output_contains:
+    - "workiq"
+    - "401"
+    - "action_required"
+    - "ask_user"
+  outcomes:
+    - type: task_completed

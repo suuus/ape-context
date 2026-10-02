@@ -1,0 +1,38 @@
+id: detect-stack-fixtures
+name: Detect stack from fixtures
+description: Ensures package, CI, MCP, and Copilot config signals are summarized from workspace fixtures.
+tags:
+  - stack
+  - happy-path
+inputs:
+  prompt: |
+    This is a dry-run evaluation: scan only the eval workspace files, do not search outside it, and do not edit files.
+    Use the context-detect skill and summarize the detected stack plus the detected_stack fields you would persist.
+  files:
+    - path: package.json
+      content: |
+        {"scripts":{"test":"vitest","build":"vite build"},"dependencies":{"@vitejs/plugin-react":"latest","typescript":"latest"}}
+    - path: .github/workflows/ci.yml
+      content: |
+        name: ci
+        on: [push]
+        jobs:
+          test:
+            runs-on: ubuntu-latest
+            steps:
+              - run: npm test
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"atlassian-jira":{"type":"local","tools":["*"]},"microsoft-365":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use GitHub Actions for CI and Jira for issue tracking.
+expected:
+  output_contains:
+    - "TypeScript"
+    - "GitHub Actions"
+    - "atlassian-jira"
+    - "microsoft-365"
+    - "detected_stack"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,24 @@
+id: m365-write-gap
+name: M365 write gap
+description: Ensures WorkIQ read coverage is reused but a write-capable server is recommended only when writes are needed.
+tags:
+  - m365
+  - scoping
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only provided context, do not search live catalogs, and do not edit files.
+    Use context-discover. `.mcp.json` has workiq. detected_stack includes SharePoint, Outlook, and Teams. The user says they need to create SharePoint pages and send emails.
+    Explain what is already covered and what additional MCP coverage should be recommended.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"workiq":{"type":"local","tools":["ask_work_iq"]}}}
+expected:
+  output_contains:
+    - "workiq"
+    - "read"
+    - "write"
+    - "microsoft-365"
+    - "recommended"
+  outcomes:
+    - type: task_completed

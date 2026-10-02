@@ -1,0 +1,23 @@
+id: persistence-contract
+name: Persistence contract
+description: Ensures the skill states the exact tagged_doc_sources schema.
+tags:
+  - contract
+inputs:
+  prompt: |
+    This is a dry-run evaluation: answer in prose only and do not edit files.
+    Use context-docs and describe the exact tagged_doc_sources JSON contract, including optional fields and allowed tags.
+expected:
+  output_contains:
+    - "category"
+    - "platform"
+    - "location"
+    - "tag"
+    - "url"
+    - "notes"
+    - "intent"
+    - "constraint"
+    - "process"
+    - "reference"
+  outcomes:
+    - type: task_completed

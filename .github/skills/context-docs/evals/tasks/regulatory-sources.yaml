@@ -1,0 +1,22 @@
+id: regulatory-sources
+name: Regulatory and compliance sources
+description: Ensures compliance, regulatory, and audit documentation sources are discoverable and tagged for distillation.
+tags:
+  - docs
+  - compliance
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Use only the supplied answers; do not fetch external docs and do not edit files.
+    Use context-docs with these answers:
+    Security/compliance/regulatory/audit: SharePoint site "legal-compliance", folder "GDPR-DORA-SOC2"; reference in instructions; tag as constraint; notes "EU GDPR, DORA, SOC 2 evidence requirements".
+    Produce tagged_doc_sources.
+expected:
+  output_contains:
+    - "tagged_doc_sources"
+    - "legal-compliance"
+    - "GDPR"
+    - "DORA"
+    - "SOC"
+    - "constraint"
+  outcomes:
+    - type: task_completed

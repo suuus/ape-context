@@ -1,0 +1,37 @@
+id: intent-affecting-change
+name: Intent-affecting cloud security deploy change
+description: Ensures cloud/security/deploy drift is action-required and prompts for re-distill.
+tags:
+  - intent
+  - action-required
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. The current instructions mention GitHub Actions and Azure only, but the fixtures show a new AWS deploy workflow and Trivy security scanning.
+    Report severity and follow-up.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Deploy through GitHub Actions to Azure. Security scanning uses CodeQL.
+    - path: .github/workflows/deploy.yml
+      content: |
+        name: deploy
+        on: [push]
+        jobs:
+          deploy:
+            runs-on: ubuntu-latest
+            steps:
+              - run: aws cloudformation deploy --template-file stack.yml --stack-name app
+              - run: trivy fs .
+expected:
+  output_contains:
+    - "intent_affecting"
+    - "action_required"
+    - "AWS"
+    - "Trivy"
+    - "context-distill"
+  outcomes:
+    - type: task_completed

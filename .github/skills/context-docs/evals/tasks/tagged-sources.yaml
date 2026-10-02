@@ -1,0 +1,29 @@
+id: tagged-sources
+name: Tag mixed documentation sources
+description: Ensures supplied documentation locations are normalized into tagged_doc_sources.
+tags:
+  - docs
+  - schema
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Use only the supplied answers; do not fetch external docs and do not edit files.
+    Use context-docs with these answers:
+    Engineering docs: SharePoint site "engineering" should be referenced in instructions.
+    Security/compliance: Backstage catalog "security-standards" should be referenced.
+    API specs: repo path "openapi/" should be referenced.
+    Product docs: Other platform "Linear docs export", location "product/prds", notes "PM-owned".
+    Produce the tagged_doc_sources output.
+expected:
+  output_contains:
+    - "tagged_doc_sources"
+    - "Engineering"
+    - "SharePoint"
+    - "engineering"
+    - "Security"
+    - "Backstage"
+    - "constraint"
+    - "openapi"
+    - "other"
+    - "PM-owned"
+  outcomes:
+    - type: task_completed

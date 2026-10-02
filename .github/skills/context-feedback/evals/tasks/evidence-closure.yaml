@@ -1,0 +1,24 @@
+id: evidence-closure
+name: Close the bootstrap loop with AERP
+description: Ensures final feedback captures truthful Evidence with exact Intent and Structure bindings.
+tags: [evidence, aerp, bindings]
+inputs:
+  prompt: |
+    Dry run only; do not call tools or write files. The workflow has a connected
+    healthcheck, a passing CAFE(S) assessment, explicit human ratification, one
+    ratified ADRP record, and one effective ASRP record. Explain which AERP
+    record types context-feedback creates, the exact bind and validation
+    commands, the state persisted, and how failures or warnings remain truthful.
+expected:
+  output_contains:
+    - "observation"
+    - "assessment"
+    - "approval"
+    - "outcome"
+    - "aerp bind"
+    - "aerp bind-structure"
+    - "aerp validate"
+    - "aerp verify"
+    - "context_evidence"
+  outcomes:
+    - type: task_completed

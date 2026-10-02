@@ -1,0 +1,30 @@
+id: new-terraform-tool
+name: New Terraform tool not covered
+description: Ensures new uncovered tools are reported as drift and fixes are offered without editing.
+tags:
+  - stack
+  - new-tool
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. Terraform appears in the workspace, but .mcp.json only configures GitHub.
+    Return the drift_report and how you would offer a fix.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use github-mcp-server for GitHub operations.
+    - path: main.tf
+      content: |
+        terraform { required_version = ">= 1.6.0" }
+        resource "azurerm_resource_group" "rg" { name = "rg-demo" location = "eastus" }
+expected:
+  output_contains:
+    - "Terraform"
+    - "drift_report"
+    - "warnings"
+    - "ask_user"
+  outcomes:
+    - type: task_completed

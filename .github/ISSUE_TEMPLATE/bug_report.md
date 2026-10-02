@@ -18,8 +18,12 @@ A clear description of what the bug is.
 - [ ] context-configure (Phase 6)
 - [ ] context-healthcheck (Phase 7)
 - [ ] context-distill (Phase 8)
-- [ ] context-instructions (Phase 9)
-- [ ] context-feedback (Phase 10)
+- [ ] context-decisions (Phase 9)
+- [ ] context-structure (Phase 10)
+- [ ] context-instructions (Phase 11)
+- [ ] context-quality (Phase 12)
+- [ ] context-ratify (Phase 13)
+- [ ] context-feedback (Phase 14)
 - [ ] context-history (standalone)
 - [ ] context-drift (standalone)
 - [ ] context-wizard (orchestrator)
@@ -35,7 +39,7 @@ What should have happened.
 ## Environment
 - Copilot surface: [VS Code / GitHub.com / Copilot CLI]
 - OS: [e.g., macOS 15, Windows 11]
-- Plugin version: [e.g., 0.0.1]
+- Plugin version: [e.g., 0.1.0]
 
 ## Additional context
 Any screenshots, logs, or other details.

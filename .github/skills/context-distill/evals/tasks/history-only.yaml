@@ -1,0 +1,26 @@
+id: history-only
+name: Missing docs with history observations
+description: Ensures history_observations can drive distillation when docs are absent.
+tags:
+  - history
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the simulated inputs below. Do not query real M365, Jira, SharePoint, or session history, and do not edit files.
+    Simulated session_state: tagged_doc_sources is missing.
+    Simulated history_observations:
+      intent: ["Repeated work improves Waza skill quality and dry-run eval reliability"]
+      constraints: ["Eval prompts must not touch real repos or live services"]
+      topology: ["Context skills feed context-wizard phases"]
+      gaps: ["Documentation sources were not discovered"]
+      sources: ["sessions.summary", "session_files aggregate"]
+    Produce distilled_intent and note the missing docs.
+expected:
+  output_contains:
+    - "distilled_intent"
+    - "history"
+    - "Waza"
+    - "dry-run"
+    - "missing"
+  outcomes:
+    - type: task_completed

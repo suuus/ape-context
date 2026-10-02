@@ -1,0 +1,16 @@
+id: phase-order
+name: Phase order and todo dependencies
+description: Ensures the agent plans the full context-wizard phase sequence and dependency chain before acting.
+tags:
+  - orchestration
+  - todos
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call tools, edit files, or call live systems.
+    Act as context-wizard starting a fresh setup. Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    If populated, entries use only these keys: state_handoffs={key,writer,readers}; gates={gate,status,blocks,recovery}; service_health={server,status,required_for_distill,classification}; artifact_actions={artifact,action,allowed,requires_approval,sanitized}. phase_order contains exact context-* skill names, never phase numbers or ctx-* todo IDs. Never invent alternate keys.
+    Set scenario to "phase-order". Put all 14 exact skill names in dependency order in phase_order, including context-structure between context-decisions and context-instructions. Leave every other array empty.
+expected:
+  outcomes:
+    - type: task_completed

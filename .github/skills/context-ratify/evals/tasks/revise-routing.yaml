@@ -1,0 +1,19 @@
+id: revise-routing
+name: Revision reopens the selected phase
+description: Ensures revision writes no approval and routes to the appropriate phase.
+tags: [ratification, revise]
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not write files.
+    Use context-ratify and simulate that the user chooses Revise because an authoritative policy source was omitted. Route to context-distill, then require context-instructions and context-quality again before another ratification attempt.
+    context_quality_review={"artifact":".github/copilot-instructions.md#enterprise-context","artifact_fingerprint":"sha256:fixture-context-v1","status":"pass","blocking_findings":[],"warnings":[],"unassessed":[]}
+    distilled_intent={"intent":[],"constraints":[],"autonomy":[],"gaps":["Authoritative policy source omitted"]}
+expected:
+  output_contains:
+    - "Revise"
+    - "context-distill"
+    - "context-instructions"
+    - "context-quality"
+    - "no ratification"
+  outcomes:
+    - type: task_completed

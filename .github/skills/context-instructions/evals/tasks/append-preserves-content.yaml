@@ -1,0 +1,27 @@
+id: append-preserves-content
+name: Append Enterprise Context
+description: Appends Enterprise Context while preserving existing non-enterprise content.
+tags: [merge, append]
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only fixtures and do not edit real files.
+    Use context-instructions. The existing instructions have no Enterprise Context.
+    Show the merged result or a concise diff, preserving all existing sections.
+  files:
+    - path: .github/copilot-instructions.md
+      content: |
+        # Copilot Instructions
+
+        ## Coding Style
+        Keep tests fast.
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"atlassian-jira":{"command":"npx","args":["jira-mcp"]}}}
+expected:
+  output_contains:
+    - "Keep tests fast"
+    - "Enterprise Context"
+    - "atlassian-jira"
+    - "append"
+  outcomes:
+    - type: task_completed

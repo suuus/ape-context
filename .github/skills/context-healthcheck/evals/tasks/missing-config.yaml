@@ -1,0 +1,16 @@
+id: missing-config
+name: Missing .mcp.json
+description: Ensures missing MCP config stops cleanly without tool calls.
+tags:
+  - healthcheck
+  - fallback
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not call real MCP tools or edit files.
+    Use context-healthcheck when .mcp.json is missing. Explain the result and whether anything is blocking.
+expected:
+  output_contains:
+    - ".mcp.json"
+    - "healthcheck_results"
+  outcomes:
+    - type: task_completed

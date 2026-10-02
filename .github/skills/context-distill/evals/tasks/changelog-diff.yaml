@@ -1,0 +1,28 @@
+id: changelog-diff
+name: Changelog diff behavior
+description: Ensures changelog diff classes and local side effects are acknowledged.
+tags:
+  - changelog
+  - persistence
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not edit files. Simulate a manual re-distill.
+    Previous distilled intent:
+    - "Reliability over velocity"
+    - "Agents can create draft PRs"
+    - "Legacy support must remain"
+    New confirmed distilled intent:
+    - "Reliability and security over velocity"
+    - "Agents can create draft PRs"
+    - "Security review required for auth changes"
+    Explain changelog classification and side effects.
+expected:
+  output_contains:
+    - "added"
+    - "modified"
+    - "removed"
+    - "unchanged"
+    - ".github/intent-changelog.md"
+    - "manual re-distill"
+  outcomes:
+    - type: task_completed

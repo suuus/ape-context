@@ -1,0 +1,30 @@
+id: clean-report
+name: No drift clean report
+description: Ensures matching stack, config, instructions, and health produce empty drift arrays.
+tags:
+  - happy-path
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only the provided fixtures, do not make live MCP calls, and do not edit files.
+    Use context-drift. Detected stack is GitHub Actions and Jira; MCP health is connected for github-mcp-server and atlassian-jira; no dependency updates are visible.
+    Report the drift_report.
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"github-mcp-server":{"type":"local","tools":["*"]},"atlassian-jira":{"type":"local","tools":["*"]}}}
+    - path: .github/copilot-instructions.md
+      content: |
+        Use github-mcp-server for GitHub and atlassian-jira for Jira.
+    - path: .github/workflows/ci.yml
+      content: |
+        name: ci
+        on: [push]
+expected:
+  output_contains:
+    - "drift_report"
+    - "action_required"
+    - "warnings"
+    - "info"
+    - "[]"
+  outcomes:
+    - type: task_completed

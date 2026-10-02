@@ -1,0 +1,25 @@
+id: regulatory-constraints
+name: Regulatory constraints in instructions
+description: Ensures distilled regulatory constraints are rendered into Enterprise Context output.
+tags:
+  - compliance
+  - instructions
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only fixtures and do not edit files.
+    Use context-instructions and show the Enterprise Context sections for these values:
+    tagged_doc_sources=[{"category":"Compliance and regulatory","platform":"SharePoint","location":"legal-compliance/GDPR-DORA-SOC2","tag":"constraint","notes":"EU GDPR, DORA, SOC 2"}]
+    distilled_intent={"intent":["Customer trust outranks feature velocity for regulated workflows"],"constraints":["GDPR DSAR responses within 30 days","DORA material ICT incidents require escalation","SOC 2 changes require evidence"],"autonomy":[{"action":"Handle regulated customer data","level":"ALWAYS ASK","reason":"Compliance review required","source":"legal-compliance"}],"topology":[]}
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"workiq":{"command":"npx","args":["@microsoft/workiq"]}}}
+expected:
+  output_contains:
+    - "Customer trust"
+    - "GDPR"
+    - "DORA"
+    - "SOC"
+    - "ALWAYS ASK"
+  outcomes:
+    - type: task_completed

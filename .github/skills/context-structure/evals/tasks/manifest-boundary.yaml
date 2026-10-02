@@ -1,0 +1,20 @@
+id: manifest-boundary
+name: Keep execution external
+description: Ensures manifest compilation does not claim execution or approval.
+tags: [structure, execution, manifest]
+inputs:
+  prompt: |
+    Dry run only. The user has confirmed an ASRP record, scope, and entry point.
+    Explain when an execution manifest can be compiled, what exact bindings it
+    carries, and what Ape Context must not claim afterward.
+expected:
+  output_contains:
+    - "asrp compile"
+    - "Intent"
+    - "Structure"
+    - "Evidence"
+    - "external"
+  output_not_contains:
+    - "deployment completed"
+  outcomes:
+    - type: task_completed

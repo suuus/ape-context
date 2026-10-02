@@ -3,3 +3,7 @@
 !.env.example
 .DS_Store
 node_modules/
+__pycache__/
+*.pyc
+.github/context-report.md
+.github/intent-changelog.md

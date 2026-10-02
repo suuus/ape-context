@@ -1,0 +1,19 @@
+id: auth-failure-recovery
+name: Auth failure recovery
+description: Ensures failed read-only auth tests are reported without false success.
+tags:
+  - auth
+  - failure
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not create, edit, or delete files; answer in prose only.
+    Use the context-configure skill. After configuring the workiq MCP server, its lightweight read-only test returns 401.
+    What should the agent report and do next?
+expected:
+  output_contains:
+    - "401"
+    - "retry"
+    - "healthcheck"
+    - "connected"
+  outcomes:
+    - type: task_completed

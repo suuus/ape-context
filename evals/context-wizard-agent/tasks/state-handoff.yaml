@@ -1,0 +1,35 @@
+id: state-handoff
+name: Cross-skill state handoff
+description: Ensures the agent names the persisted state contracts consumed by downstream phases.
+tags:
+  - orchestration
+  - state
+inputs:
+  prompt: |
+    This is a dry-run agent-level Waza eval. Do not call tools, edit files, or query live systems.
+    Return exactly one JSON object and no prose. Use exactly this shape:
+    {"contract_version":"wizard-dry-run/v1","scenario":"","dry_run":true,"phase_order":[],"state_handoffs":[],"gates":[],"service_health":[],"artifact_actions":[],"approvals":{"required":[],"granted":[]},"side_effects":{"performed":[],"planned":[]}}
+    state_handoffs entries use only {key,writer,readers}. Never invent alternate keys.
+    Set scenario to "state-handoff". Populate only state_handoffs with these exact mappings:
+    detected_stack: writer=context-detect, readers=[context-discover,context-drift];
+    discovered_servers: writer=context-discover, readers=[context-review,context-install];
+    scoping_decisions: writer=context-discover, readers=[context-install];
+    tagged_doc_sources: writer=context-docs, readers=[context-distill];
+    healthcheck_results: writer=context-healthcheck, readers=[context-distill,context-quality,context-feedback];
+    distilled_intent: writer=context-distill, readers=[context-decisions,context-structure,context-instructions,context-quality,context-ratify,context-feedback];
+    decision_candidates: writer=context-distill, readers=[context-decisions];
+    decision_sources: writer=context-distill, readers=[context-decisions];
+    structure_candidates: writer=context-distill, readers=[context-structure];
+    decision_drafts: writer=context-decisions, readers=[context-structure,context-instructions,context-quality,context-ratify];
+    imported_decisions: writer=context-decisions, readers=[context-instructions,context-quality,context-ratify,context-feedback,context-drift];
+    structure_drafts: writer=context-structure, readers=[context-instructions,context-quality,context-ratify];
+    context_quality_review: writer=context-quality, readers=[context-ratify,context-feedback,context-drift];
+    decision_records: writer=context-ratify, readers=[context-feedback,context-drift];
+    structure_records: writer=context-ratify, readers=[context-feedback,context-drift];
+    execution_manifest: writer=context-ratify, readers=[context-feedback,context-drift];
+    context_ratification: writer=context-ratify, readers=[context-feedback,context-drift];
+    context_evidence: writer=context-feedback, readers=[context-drift].
+    Leave every other array empty.
+expected:
+  outcomes:
+    - type: task_completed

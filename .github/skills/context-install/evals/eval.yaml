@@ -1,0 +1,32 @@
+name: context-install-eval
+description: Tests .mcp.json merge behavior, tool scoping, blocked server avoidance, missing-state, and malformed config handling.
+skill: context-install
+version: "0.1"
+config:
+  trials_per_task: 1
+  timeout_seconds: 180
+  parallel: false
+  executor: copilot-sdk
+  model: claude-sonnet-4.6
+  skill_directories:
+    - ".."
+  required_skills:
+    - context-install
+metrics:
+  - name: accuracy
+    weight: 1.0
+    threshold: 0.8
+graders:
+  - type: code
+    name: meaningful_output
+    config:
+      assertions:
+        - "len(output.strip()) > 120"
+  - type: text
+    name: no_runtime_or_auth
+    config:
+      regex_not_match:
+        - "(?i)\\b(I|we)\\s+(ran|executed|started)\\s+(npm|npx|auth|login)"
+        - "(?i)\\b(I|we)\\s+(created|modified|wrote|edited)\\s+real"
+tasks:
+  - "tasks/*.yaml"

@@ -1,0 +1,25 @@
+id: simulated-observations
+name: Simulated observations schema
+description: Ensures consented simulated data is distilled into the shared output contract.
+tags:
+  - schema
+  - happy-path
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not call session_store_sql or any live history tool.
+    Use context-history with simulated consent=true and scope=personal.
+    Simulated session_store_sql/DuckDB outputs:
+    - sessions: "Remediate Waza skill evals", "Fix Azure deployment workflow"
+    - session_files aggregates: SKILL.md=6, eval.yaml=4, .github/workflows/deploy.yml=3
+    - session_refs aggregates: pr=2, issue=2
+    Produce recent behavioral patterns using the required history_observations schema.
+expected:
+  output_contains:
+    - "history_observations"
+    - "intent"
+    - "constraints"
+    - "topology"
+    - "gaps"
+    - "sources"
+  outcomes:
+    - type: task_completed

@@ -1,0 +1,33 @@
+id: merge-scope
+name: Merges approved servers with scopes
+description: Ensures approved servers are added while existing config is preserved and blocked servers skipped.
+tags:
+  - install
+  - merge
+inputs:
+  prompt: |
+    This is a dry-run evaluation. Do not edit files or run npm/npx. Show the merged .mcp.json you would write.
+    Use context-install with:
+    discovered_servers=[
+      {"name":"github-mcp-server","status":"recommended","command":"npx","args":["-y","@modelcontextprotocol/server-github"]},
+      {"name":"atlassian-jira","status":"blocked","command":"npx","args":["-y","@vendor/jira"]},
+      {"name":"workiq","status":"recommended","command":"npx","args":["-y","@vendor/workiq"]}
+    ]
+    scoping_decisions={"github-mcp-server":"read-only","workiq":"read-write"}
+  files:
+    - path: .mcp.json
+      content: |
+        {"mcpServers":{"existing-server":{"command":"node","args":["server.js"],"type":"local","tools":["search"]}}}
+expected:
+  output_contains:
+    - "existing-server"
+    - "github-mcp-server"
+    - "workiq"
+    - "type"
+    - "local"
+    - "tools"
+    - "skipped"
+    - "atlassian-jira"
+    - "read-only"
+  outcomes:
+    - type: task_completed

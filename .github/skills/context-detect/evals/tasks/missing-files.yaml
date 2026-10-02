@@ -1,0 +1,21 @@
+id: missing-files
+name: Missing optional files
+description: Ensures absent package, CI, infra, and MCP files are reported as none found rather than treated as failures.
+tags:
+  - standalone
+  - error-handling
+inputs:
+  prompt: |
+    This is a dry-run evaluation: scan only the eval workspace files, do not search outside it, and do not edit files.
+    Use the context-detect skill in this sparse workspace and explain how missing package, CI, infra, and .mcp.json files should be reported.
+  files:
+    - path: README.md
+      content: |
+        # Empty sample repo
+expected:
+  output_contains:
+    - "none found"
+    - ".mcp.json"
+    - "detected_stack"
+  outcomes:
+    - type: task_completed

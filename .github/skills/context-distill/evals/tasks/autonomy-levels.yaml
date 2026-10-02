@@ -1,0 +1,23 @@
+id: autonomy-levels
+name: Autonomy level classification
+description: Ensures PROCEED, ALWAYS ASK, and NEVER classifications are produced.
+tags:
+  - autonomy
+inputs:
+  prompt: |
+    This is a dry-run evaluation: use only these simulated statements and do not query live tools or edit files.
+    Docs/history signals:
+    - Engineers may read CI logs and documentation.
+    - Merging PRs or production deployment requires human approval.
+    - Payroll administration is outside this team's domain.
+    Classify autonomy boundaries.
+expected:
+  output_contains:
+    - "PROCEED"
+    - "ALWAYS ASK"
+    - "NEVER"
+    - "CI logs"
+    - "PR"
+    - "Payroll"
+  outcomes:
+    - type: task_completed

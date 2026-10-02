@@ -1,0 +1,23 @@
+id: empty-history
+name: Empty history
+description: Ensures empty simulated results produce empty observations with notes.
+tags:
+  - empty
+  - error-handling
+inputs:
+  prompt: |
+    This is a dry-run evaluation: do not call session_store_sql or any live history tool.
+    Use context-history with simulated consent=true and scope=personal.
+    Simulated session_store_sql results are empty for sessions, session_files, session_refs, and turns.
+    Report the correct output.
+expected:
+  output_contains:
+    - "no recent patterns"
+    - "history_observations"
+    - "intent"
+    - "constraints"
+    - "topology"
+    - "gaps"
+    - "sources"
+  outcomes:
+    - type: task_completed

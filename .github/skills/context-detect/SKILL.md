@@ -1,53 +1,36 @@
 ---
 name: context-detect
-description: Scan the current project to detect the development stack, tools, and existing configuration
-user-invocable: true
+description: >-
+  READ-ONLY DETECTION. USE FOR: detect project stack, inventory MCP servers,
+  summarize repository tooling, prepare wizard discovery. DO NOT USE FOR:
+  installation, authentication, healthchecks, or edits. INVOKES: workspace
+  search/read, git history, session_state persistence.
+license: MIT
+metadata:
+  version: 0.1.0
+  user-invocable: true
 ---
 
-Scan the project in the current working directory and report what you find.
+## Steps
+1. Read `.github/copilot-instructions.md` if present.
+2. Scan package manifests: `package.json`, `requirements.txt`, `go.mod`, `Cargo.toml`, `pom.xml`, `build.gradle`.
+3. Scan CI/CD and infra: workflows, Jenkins/GitLab/Azure/CircleCI files, Docker, Kubernetes, Terraform/Bicep/CloudFormation, `.azure/`, serverless, CDK, Pulumi.
+4. Read `.mcp.json` if present and list every configured MCP server; these are already installed and must be preserved.
+5. Inspect agents, skills, editor config, and recent git history for tool references.
+6. Report source control, stack, CI/CD, cloud, MCP, Copilot config, CLI tools,
+   and conflicts. Missing categories are `none found`.
+7. Persist `detected_stack` in `session_state` using this schema:
 
-## What to scan
-
-0. **Read current instructions**: Analyze the .github/copilot-instructions.md
-1. **Package files**: package.json, requirements.txt, go.mod, Cargo.toml, pom.xml, build.gradle
-2. **CI/CD**: .github/workflows/, Jenkinsfile, .gitlab-ci.yml, azure-pipelines.yml, .circleci/
-3. **Infrastructure**: bicep/terraform/cloudformation files, Dockerfile, docker-compose.yml, kubernetes manifests
-4. **Existing MCP config**: Read .mcp.json — list ALL currently configured MCP servers. These are already installed and should be preserved.
-5. **Existing Copilot config**: .github/copilot-instructions.md, .github/agents/, .github/skills/, and other relevant files under .github/ , .vscode/
-6. **Git history**: check recent commit messages for tool references (JIRA-123, LINEAR-456, ADO-789, etc.)
-7. **Cloud indicators**: .azure/, serverless.yml, cdk.json, pulumi files
-
-## Critical: existing MCP servers
-
-Read .mcp.json and list every server that's already configured. These are ALREADY WORKING and must be:
-- Preserved in all future phases
-- Recognized when matching tools to categories (e.g., "workiq" covers M365/SharePoint/Outlook)
-- Not duplicated by installing alternatives
-
-## What to report
-
-Summarize your findings in a clear list:
-- Source control platform
-- Languages and frameworks detected
-- CI/CD system
-- Cloud platform (if any)
-- Tool references found in git history
-- **Already configured MCP servers** (from .mcp.json)
-- Existing Copilot configuration
-- cli tools & scripts that are relevant in this context
-
-## Persist results
-
-Write the detected stack to the session store so downstream phases can retrieve it:
-
-```sql
-INSERT OR REPLACE INTO session_state (key, value) 
-VALUES ('detected_stack', '{json summary}');
+```json
+{"languages":[],"frameworks":[],"ci_cd":[],"cloud":[],"mcp_servers":[],"copilot_config":[],"tool_references":[],"scan_notes":[]}
 ```
 
-The JSON should include: languages detected, frameworks, CI/CD system, cloud platform, existing MCP servers from `.mcp.json`, and any tool references found in git history.
+Always name the output and persistence key literally as `detected_stack`, even
+when every category is empty or SQL persistence is unavailable.
 
-Then mark this phase done:
-```sql
-UPDATE todos SET status = 'done' WHERE id = 'ctx-detect';
-```
+## Errors
+Put unreadable/malformed files in `scan_notes`. Report SQL failure; never claim
+state was saved.
+
+## Safety
+Never modify files. Wizard mode may mark `ctx-detect` done; standalone stops.

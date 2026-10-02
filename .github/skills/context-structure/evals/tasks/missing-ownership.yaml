@@ -1,0 +1,16 @@
+id: missing-ownership
+name: Preserve missing ownership
+description: Ensures the Structure handoff does not invent an owner.
+tags: [structure, gaps]
+inputs:
+  prompt: |
+    Dry run only. A source describes a production deployment component and a
+    blocking compliance gate, but no owner, responsible actor, or approved entry
+    point is known. Explain how context-structure handles the candidate.
+expected:
+  output_contains:
+    - "gap"
+  output_not_contains:
+    - "Platform Engineering is the owner"
+  outcomes:
+    - type: task_completed
